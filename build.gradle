@@ -18,8 +18,10 @@ repositories {
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     compile 'io.javalin:javalin:3.8.0'
+    compile 'org.slf4j:slf4j-simple:1.7.28'
+    compile 'org.json:json:20160810'
+    compile 'com.j2html:j2html:1.4.0'
 }
-
 
 compileKotlin {
     kotlinOptions.jvmTarget = "1.8"
