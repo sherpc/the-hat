@@ -5,11 +5,24 @@ import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import game.*
+
+import com.google.gson.Gson
 
 private val userUsernameMap = ConcurrentHashMap<WsContext, String>()
 private var nextUserNumber = 1 // Assign to username for next connecting user
 
 fun main(args: Array<String>) {
+    val fakeSettings = GameSettings("Test", 7, 6)
+    println(fakeSettings)
+    val gson = Gson()
+    val user = User("Vasya")
+    user.ready()
+    val game = Game(fakeSettings)
+    game.addUser(user)
+    println(gson.toJson(game))
+
+    return
     Javalin.create {
         it.addStaticFiles("/public")
     }.apply {
