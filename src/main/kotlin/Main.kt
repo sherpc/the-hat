@@ -1,3 +1,4 @@
+import api.GamesController
 import io.javalin.Javalin
 import io.javalin.websocket.WsContext
 import j2html.TagCreator.*
@@ -6,42 +7,65 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import game.*
+import io.javalin.apibuilder.ApiBuilder.*
+import io.javalin.plugin.rendering.vue.VueComponent
 
-import com.google.gson.Gson
+// import com.google.gson.Gson
 
 private val userUsernameMap = ConcurrentHashMap<WsContext, String>()
 private var nextUserNumber = 1 // Assign to username for next connecting user
 
-fun main(args: Array<String>) {
+fun test() {
     val fakeSettings = GameSettings("Test", 7, 6)
     println(fakeSettings)
-    val gson = Gson()
+    //val gson = Gson()
     val user = User("Vasya")
     user.ready()
     val game = Game(fakeSettings)
     game.addUser(user)
-    println(gson.toJson(game))
+    //println(gson.toJson(game))
+}
 
-    return
-    Javalin.create {
-        it.addStaticFiles("/public")
+fun main(args: Array<String>) {
+    val app = Javalin.create {
+        it.enableWebjars()
+        // it.addStaticFiles("/public")
     }.apply {
-        ws("/chat") { ws ->
-            ws.onConnect { ctx ->
-                val username = "User" + nextUserNumber++
-                userUsernameMap.put(ctx, username)
-                broadcastMessage("Server", "$username joined the chat")
-            }
-            ws.onClose { ctx ->
-                val username = userUsernameMap[ctx]
-                userUsernameMap.remove(ctx)
-                broadcastMessage("Server", "$username left the chat")
-            }
-            ws.onMessage { ctx ->
-                broadcastMessage(userUsernameMap[ctx]!!, ctx.message())
+//        ws("/chat") { ws ->
+//            ws.onConnect { ctx ->
+//                val username = "User" + nextUserNumber++
+//                userUsernameMap.put(ctx, username)
+//                broadcastMessage("Server", "$username joined the chat")
+//            }
+//            ws.onClose { ctx ->
+//                val username = userUsernameMap[ctx]
+//                userUsernameMap.remove(ctx)
+//                broadcastMessage("Server", "$username left the chat")
+//            }
+//            ws.onMessage { ctx ->
+//                broadcastMessage(userUsernameMap[ctx]!!, ctx.message())
+//            }
+//        }
+    }.start(7070)
+
+    app.get("/", VueComponent("<games></games>"))
+    app.get("/games/:game-id", VueComponent("<game></game>"))
+
+    //app.get("/api/games/", GamesController::getAll)
+    //app.get("/api/games/:game-id", GamesController::getOne)
+    //app.post("/api/games/", GamesController::createGame)
+
+    app.routes {
+        path("api") {
+            path("games") {
+                get(GamesController::getAll)
+                post(GamesController::createGame)
+                path(":game-id") {
+                    get(GamesController::getOne)
+                }
             }
         }
-    }.start(7070)
+    }
 }
 
 // Sends a message from one user to all users, along with a list of current usernames

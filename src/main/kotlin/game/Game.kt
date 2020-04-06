@@ -22,6 +22,11 @@ class Game(val settings: GameSettings) {
     val id = UUID.randomUUID().toString()
     val users: MutableSet<User> = mutableSetOf()
 
+    init {
+        if (settings.personsCount % 2 != 0)
+            throw Exception("There should be even number of persons.")
+    }
+
     fun addUser(user: User) {
         if (users.size >= settings.personsCount)
             throw Exception("Too many users for game.")

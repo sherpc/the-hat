@@ -17,10 +17,12 @@ repositories {
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
-    compile 'com.google.code.gson:gson:2.8.5'
+    // compile 'com.google.code.gson:gson:2.8.5'
     compile 'io.javalin:javalin:3.8.0'
+    compile 'com.fasterxml.jackson.module:jackson-module-kotlin:2.9.9'
     compile 'org.slf4j:slf4j-simple:1.7.28'
     compile 'org.json:json:20160810'
+    compile 'org.webjars.npm:vue:2.6.10'
     compile 'com.j2html:j2html:1.4.0'
 }
 
