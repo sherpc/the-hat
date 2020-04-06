@@ -23,6 +23,7 @@ dependencies {
     compile 'org.slf4j:slf4j-simple:1.7.28'
     compile 'org.json:json:20160810'
     compile 'org.webjars.npm:vue:2.6.10'
+    compile 'org.webjars.bowergithub.pagekit:vue-resource:1.5.1'
     compile 'com.j2html:j2html:1.4.0'
 }
 

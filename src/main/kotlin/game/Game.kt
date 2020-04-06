@@ -24,7 +24,7 @@ class Game(val settings: GameSettings) {
 
     init {
         if (settings.personsCount % 2 != 0)
-            throw Exception("There should be even number of persons.")
+            throw IllegalArgumentException("There should be even number of persons.")
     }
 
     fun addUser(user: User) {
