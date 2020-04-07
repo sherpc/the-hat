@@ -16,6 +16,10 @@ class User(val name: String) {
     fun ready() {
         status = UserStatus.ReadyToJoin
     }
+
+    fun notReady() {
+        status = UserStatus.SelectingWords
+    }
 }
 
 class Game(val settings: GameSettings) {

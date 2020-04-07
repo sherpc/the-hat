@@ -1,15 +1,18 @@
 <template id="game">
     <div>
-        <ul v-if="game">
-            <dt>game ID</dt>
-            <dd>{{game.id}}</dd>
-            <dt>Title</dt>
-            <dd>{{game.settings.title}}</dd>
-            <dt>Words count</dt>
-            <dd>{{game.settings.wordsCount}}</dd>
-            <dt>Persons count</dt>
-            <dd>{{game.settings.personsCount}}</dd>
-        </ul>
+        <div v-if="game">
+            <ul>
+                <dt>game ID</dt>
+                <dd>{{game.id}}</dd>
+                <dt>Title</dt>
+                <dd>{{game.settings.title}}</dd>
+                <dt>Words count</dt>
+                <dd>{{game.settings.wordsCount}}</dd>
+                <dt>Persons count</dt>
+                <dd>{{game.settings.personsCount}}</dd>
+            </ul>
+            <new-user v-bind:game-id="game.id"></new-user>
+        </div>
     </div>
 </template>
 <script>

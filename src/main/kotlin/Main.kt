@@ -48,8 +48,8 @@ fun main(args: Array<String>) {
 //        }
     }.start(7070)
 
-    app.get("/", VueComponent("<games></games>"))
-    app.get("/games/:game-id", VueComponent("<game></game>"))
+    app.get("/", VueComponent("games"))
+    app.get("/games/:game-id", VueComponent("game"))
 
     //app.get("/api/games/", GamesController::getAll)
     //app.get("/api/games/:game-id", GamesController::getOne)
