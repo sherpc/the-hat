@@ -20,8 +20,7 @@
                     return
                 }
 
-                const data = {name, gameId: this.gameId};
-                Vue.http.post("/api/games/join", data).then(response => {
+                Vue.http.post(`/api/games/${this.gameId}/join`, name).then(response => {
                     const user = response.json();
                     console.info("Game joined, user: ", user);
                     this.name = '';

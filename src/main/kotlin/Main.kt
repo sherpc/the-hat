@@ -6,7 +6,6 @@ import org.json.JSONObject
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
-import game.*
 import io.javalin.apibuilder.ApiBuilder.*
 import io.javalin.plugin.rendering.vue.VueComponent
 
@@ -14,17 +13,6 @@ import io.javalin.plugin.rendering.vue.VueComponent
 
 private val userUsernameMap = ConcurrentHashMap<WsContext, String>()
 private var nextUserNumber = 1 // Assign to username for next connecting user
-
-fun test() {
-    val fakeSettings = GameSettings("Test", 7, 6)
-    println(fakeSettings)
-    //val gson = Gson()
-    val user = User("Vasya")
-    user.ready()
-    val game = Game(fakeSettings)
-    game.addUser(user)
-    //println(gson.toJson(game))
-}
 
 fun main(args: Array<String>) {
     val app = Javalin.create {
@@ -62,6 +50,9 @@ fun main(args: Array<String>) {
                 post(GamesController::createGame)
                 path(":game-id") {
                     get(GamesController::getOne)
+                    path("join") {
+                        post(GamesController::joinGame)
+                    }
                 }
             }
         }
