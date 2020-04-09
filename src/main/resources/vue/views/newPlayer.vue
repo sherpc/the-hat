@@ -1,12 +1,12 @@
-<template id="newUser">
+<template id="newPlayer">
     <div>
         <input v-model="name" placeholder="Your name">
         <button v-on:click="joinGame">Join game</button>
     </div>
 </template>
 <script>
-    Vue.component("newUser", {
-        template: "#newUser",
+    Vue.component("newPlayer", {
+        template: "#newPlayer",
         data: () => ({
             name: ''
         }),
@@ -21,9 +21,10 @@
                 }
 
                 Vue.http.post(`/api/games/${this.gameId}/join`, name).then(response => {
-                    const user = response.json();
-                    console.info("Game joined, user: ", user);
+                    return response.json();
+                }).then(player => {
                     this.name = '';
+                    this.$emit('game-joined', player);
                 });
             }
         }

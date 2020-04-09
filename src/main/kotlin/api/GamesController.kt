@@ -2,11 +2,14 @@ package api
 
 import io.javalin.http.Context
 import io.javalin.http.NotFoundResponse
+import io.javalin.plugin.rendering.vue.VueComponent
 import model.game.GameSettings
 import org.slf4j.LoggerFactory
 
 val testGame = model.game.newGame(GameSettings("Тестовая", 7, 6))
 val gamesInMemoryStore = mutableMapOf(testGame.id to testGame)
+
+const val SharedStateAttributeKey = "SharedStateAttributeKey"
 
 data class JoinGameDto(val gameId: String, val name: String)
 
@@ -20,6 +23,14 @@ object GamesController {
     fun getOne(ctx: Context) {
         val game = gamesInMemoryStore.get(gameIdFromPath(ctx)) ?: throw NotFoundResponse()
         ctx.json(game)
+    }
+
+    fun gameAndPlayer(ctx: Context) {
+        val game = gamesInMemoryStore.get(gameIdFromPath(ctx)) ?: throw NotFoundResponse()
+        val playerId = ctx.pathParam("player-id")
+        val player = game.players.get(playerId) ?: throw NotFoundResponse()
+        ctx.attribute(SharedStateAttributeKey, mapOf("game" to game, "player" to player))
+        VueComponent("game").handle(ctx)
     }
 
     fun createGame(ctx: Context) {
@@ -40,8 +51,9 @@ object GamesController {
         val name = ctx.body()
         val game = gamesInMemoryStore[gameIdFromPath(ctx)] ?: throw NotFoundResponse()
         val statusCode = try {
-            gamesInMemoryStore[game.id] = model.game.joinGame(game, name)
-            ctx.json(gamesInMemoryStore)
+            val player = model.game.newPlayer(name)
+            gamesInMemoryStore[game.id] = model.game.joinGame(game, player)
+            ctx.json(player)
             200
         } catch (e: Exception) {
             logger.error("Error while creating game.", e)
@@ -50,7 +62,14 @@ object GamesController {
         ctx.status(statusCode)
     }
 
+    fun stateFunction(ctx: Context): Map<String, Any> {
+        val state = ctx.attribute<Map<String, Any>>(SharedStateAttributeKey) ?: emptyMap()
+        logger.trace("State function {}", state)
+        return state
+    }
+
     private fun gameIdFromPath(ctx: Context): String {
         return ctx.pathParam("game-id")
     }
 }
+

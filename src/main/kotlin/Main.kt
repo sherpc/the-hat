@@ -7,6 +7,8 @@ import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import io.javalin.apibuilder.ApiBuilder.*
+import io.javalin.http.Context
+import io.javalin.plugin.rendering.vue.JavalinVue
 import io.javalin.plugin.rendering.vue.VueComponent
 
 // import com.google.gson.Gson
@@ -36,14 +38,18 @@ fun main(args: Array<String>) {
 //        }
     }.start(7070)
 
-    app.get("/", VueComponent("games"))
-    app.get("/games/:game-id", VueComponent("game"))
-
-    //app.get("/api/games/", GamesController::getAll)
-    //app.get("/api/games/:game-id", GamesController::getOne)
-    //app.post("/api/games/", GamesController::createGame)
+    JavalinVue.stateFunction = { ctx -> GamesController.stateFunction(ctx) }
 
     app.routes {
+        get(VueComponent("games"))
+        path("games") {
+            path(":game-id") {
+                get(VueComponent("game"))
+                path(":player-id") {
+                    get(GamesController::gameAndPlayer)
+                }
+            }
+        }
         path("api") {
             path("games") {
                 get(GamesController::getAll)

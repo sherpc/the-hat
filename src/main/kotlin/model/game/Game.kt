@@ -31,12 +31,15 @@ fun newGame(settings: GameSettings): Game {
     return Game(id, settings, GameState.GatheringParty, emptyMap())
 }
 
-fun joinGame(game: Game, name: String): Game {
+fun newPlayer(name: String): Player {
+    return Player(newId(), name, emptySet(), PlayerState.SelectingWords)
+}
+
+fun joinGame(game: Game, player: Player): Game {
     if (game.state != GameState.GatheringParty)
         throw IllegalArgumentException("Game already started.")
     if (game.players.size >= game.settings.personsCount)
         throw IllegalArgumentException("Game already full of players.")
-    val player = Player(newId(), name, emptySet(), PlayerState.SelectingWords)
     val players = game.players + Pair(player.id, player)
     val newGameState = if (players.size == game.settings.personsCount) GameState.BuildingDeck else game.state
     return game.copy(players = players, state = newGameState)
