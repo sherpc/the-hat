@@ -19,7 +19,7 @@
                 if (!this.name) {
                     return
                 }
-
+                this.$emit('joining');
                 Vue.http.post(`/api/games/${this.gameId}/join`, name).then(response => {
                     return response.json();
                 }).then(gameContext => {

@@ -3,24 +3,12 @@ package api
 import io.javalin.http.Context
 import io.javalin.http.NotFoundResponse
 import io.javalin.plugin.rendering.vue.VueComponent
-import model.game.Game
 import model.game.GameSettings
-import model.game.Player
 import org.slf4j.LoggerFactory
-
-val testGame = model.game.newGame(GameSettings("Тестовая", 7, 6))
-val gamesInMemoryStore = mutableMapOf(testGame.id to testGame)
-
-const val SharedStateAttributeKey = "SharedStateAttributeKey"
-
-data class GameContext(val game: Game, val playerId: String) {
-    fun asSharedState(): Map<String, Any> {
-        return mapOf("game" to game, "playerId" to playerId)
-    }
-}
 
 object GamesController {
     private val logger = LoggerFactory.getLogger(GamesController::class.java)
+    const val SharedStateAttributeKey = "SharedStateAttributeKey"
 
     fun getAll(ctx: Context) {
         ctx.json(gamesInMemoryStore)
@@ -33,7 +21,7 @@ object GamesController {
 
     fun gameAndPlayer(ctx: Context) {
         val gameContext = gameContextFromPath(ctx)
-        ctx.attribute(SharedStateAttributeKey, gameContext.asSharedState())
+        ctx.attribute(SharedStateAttributeKey, mapOf("gameContext" to gameContext))
         VueComponent("game").handle(ctx)
     }
 
@@ -58,6 +46,7 @@ object GamesController {
             val player = model.game.newPlayer(name)
             val updatedGame = model.game.joinGame(game, player)
             gamesInMemoryStore[game.id] = updatedGame
+            WebSocketController.broadcastGameState(updatedGame)
             ctx.json(GameContext(updatedGame, player.id))
             200
         } catch (e: Exception) {
@@ -69,7 +58,6 @@ object GamesController {
 
     fun setWords(ctx: Context) {
         val gameContext = gameContextFromPath(ctx)
-
     }
 
     fun stateFunction(ctx: Context): Map<String, Any> {
@@ -79,11 +67,11 @@ object GamesController {
     }
 
     private fun gameIdFromPath(ctx: Context): String {
-        return ctx.pathParam("game-id")
+        return ctx.pathParam(Constants.GameIdPathKey)
     }
 
     private fun playerIdFromPath(ctx: Context): String {
-        return ctx.pathParam("player-id")
+        return ctx.pathParam(Constants.PlayerIdPathKey)
     }
 
     private fun gameContextFromPath(ctx: Context): GameContext {

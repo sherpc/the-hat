@@ -1,6 +1,7 @@
 package model.game
 
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 data class GameSettings(val title: String, val wordsCount: Int, val personsCount: Int)
 
@@ -36,6 +37,7 @@ fun newPlayer(name: String): Player {
 }
 
 fun joinGame(game: Game, player: Player): Game {
+    Thread.sleep(TimeUnit.SECONDS.toMillis(1))
     if (game.state != GameState.GatheringParty)
         throw IllegalArgumentException("Game already started.")
     if (game.players.size >= game.settings.personsCount)
