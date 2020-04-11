@@ -44,3 +44,21 @@ fun joinGame(game: Game, player: Player): Game {
     val newGameState = if (players.size == game.settings.personsCount) GameState.BuildingDeck else game.state
     return game.copy(players = players, state = newGameState)
 }
+
+fun setPlayerWords(game: Game, playerId: String, newWords: Sequence<String>): Game {
+    return updatePlayer(game, playerId) { it.copy(words = newWords.toSet()) }
+}
+
+private fun setPlayerState(game: Game, playerId: String, newState: PlayerState): Game {
+    return updatePlayer(game, playerId) { it.copy(state = newState) }
+}
+
+private fun updatePlayer(game: Game, playerId: String, playerUpdate: (player: Player) -> Player): Game {
+    val currentPlayer = game.players[playerId]
+    if (currentPlayer != null) {
+        val newPlayer = playerUpdate(currentPlayer)
+        val players = game.players + Pair(playerId, newPlayer)
+        return game.copy(players = players)
+    }
+    return game
+}

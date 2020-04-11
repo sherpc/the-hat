@@ -38,7 +38,7 @@ fun main(args: Array<String>) {
 //        }
     }.start(7070)
 
-    JavalinVue.stateFunction = { ctx -> GamesController.stateFunction(ctx) }
+    JavalinVue.stateFunction = GamesController::stateFunction
 
     app.routes {
         get(VueComponent("games"))

@@ -22,9 +22,9 @@
 
                 Vue.http.post(`/api/games/${this.gameId}/join`, name).then(response => {
                     return response.json();
-                }).then(player => {
+                }).then(gameContext => {
                     this.name = '';
-                    this.$emit('game-joined', player);
+                    this.$emit('game-joined', gameContext);
                 });
             }
         }

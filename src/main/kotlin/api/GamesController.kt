@@ -3,7 +3,9 @@ package api
 import io.javalin.http.Context
 import io.javalin.http.NotFoundResponse
 import io.javalin.plugin.rendering.vue.VueComponent
+import model.game.Game
 import model.game.GameSettings
+import model.game.Player
 import org.slf4j.LoggerFactory
 
 val testGame = model.game.newGame(GameSettings("Тестовая", 7, 6))
@@ -11,7 +13,11 @@ val gamesInMemoryStore = mutableMapOf(testGame.id to testGame)
 
 const val SharedStateAttributeKey = "SharedStateAttributeKey"
 
-data class JoinGameDto(val gameId: String, val name: String)
+data class GameContext(val game: Game, val playerId: String) {
+    fun asSharedState(): Map<String, Any> {
+        return mapOf("game" to game, "playerId" to playerId)
+    }
+}
 
 object GamesController {
     private val logger = LoggerFactory.getLogger(GamesController::class.java)
@@ -26,10 +32,8 @@ object GamesController {
     }
 
     fun gameAndPlayer(ctx: Context) {
-        val game = gamesInMemoryStore.get(gameIdFromPath(ctx)) ?: throw NotFoundResponse()
-        val playerId = ctx.pathParam("player-id")
-        val player = game.players.get(playerId) ?: throw NotFoundResponse()
-        ctx.attribute(SharedStateAttributeKey, mapOf("game" to game, "player" to player))
+        val gameContext = gameContextFromPath(ctx)
+        ctx.attribute(SharedStateAttributeKey, gameContext.asSharedState())
         VueComponent("game").handle(ctx)
     }
 
@@ -52,14 +56,20 @@ object GamesController {
         val game = gamesInMemoryStore[gameIdFromPath(ctx)] ?: throw NotFoundResponse()
         val statusCode = try {
             val player = model.game.newPlayer(name)
-            gamesInMemoryStore[game.id] = model.game.joinGame(game, player)
-            ctx.json(player)
+            val updatedGame = model.game.joinGame(game, player)
+            gamesInMemoryStore[game.id] = updatedGame
+            ctx.json(GameContext(updatedGame, player.id))
             200
         } catch (e: Exception) {
             logger.error("Error while creating game.", e)
             400
         }
         ctx.status(statusCode)
+    }
+
+    fun setWords(ctx: Context) {
+        val gameContext = gameContextFromPath(ctx)
+
     }
 
     fun stateFunction(ctx: Context): Map<String, Any> {
@@ -70,6 +80,16 @@ object GamesController {
 
     private fun gameIdFromPath(ctx: Context): String {
         return ctx.pathParam("game-id")
+    }
+
+    private fun playerIdFromPath(ctx: Context): String {
+        return ctx.pathParam("player-id")
+    }
+
+    private fun gameContextFromPath(ctx: Context): GameContext {
+        val game = gamesInMemoryStore[gameIdFromPath(ctx)] ?: throw NotFoundResponse()
+        val player = game.players[playerIdFromPath(ctx)] ?: throw NotFoundResponse()
+        return GameContext(game, player.id)
     }
 }
 

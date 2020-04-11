@@ -19,16 +19,16 @@
         template: "#game",
         data: () => ({
             game: null,
-            player: null
+            playerId: null
         }),
         created() {
             const gameId = this.$javalin.pathParams["game-id"];
             const gameFromSharedState = this.$javalin.state.game;
             if (gameFromSharedState) {
                 this.game = gameFromSharedState;
-                const playerFromSharedState = this.$javalin.state.player;
-                if (playerFromSharedState) {
-                    this.player = playerFromSharedState;
+                const playerIdFromSharedState = this.$javalin.state.playerId;
+                if (playerIdFromSharedState) {
+                    this.playerId = playerIdFromSharedState;
                 }
             } else {
                 fetch(`/api/games/${gameId}`)
@@ -43,13 +43,20 @@
             },
             availableToJoin() {
                 return this.game.state == 'GatheringParty';
+            },
+            player() {
+                if (this.playerId) {
+                    return this.game.players[this.playerId];
+                }
+                return null;
             }
         },
         methods: {
-            onGameJoined: function(player) {
-                window.history.pushState(player, "Game joined", window.location.pathname + '/' + player.id);
-                console.info("Game joined, player: ", player);
-                this.player = player;
+            onGameJoined: function(gameContext) {
+                window.history.pushState(gameContext, "Game joined", window.location.pathname + '/' + gameContext.playerId);
+                console.info("Game joined, player: ", gameContext.playerId);
+                this.game = gameContext.game;
+                this.playerId = gameContext.playerId;
             }
         }
     });
