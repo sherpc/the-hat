@@ -4,7 +4,7 @@
         <div v-bind:style="{ display: showGameBoard }">
             <div v-if="game">
                 <div>game id / title: {{game.id}} / {{game.settings.title}}</div>
-                <div>capacity: {{playersCount}} / {{game.settings.personsCount}}</div>
+                <div>capacity: {{playersCount}} / {{game.settings.playersCount}}</div>
 
                 <div v-if="player">game board, hello {{player.name}}!</div>
 

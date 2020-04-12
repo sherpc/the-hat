@@ -27,7 +27,7 @@ fun newId(): String {
 
 fun newGame(settings: GameSettings): Game {
     if (settings.playersCount % 2 != 0)
-        throw IllegalArgumentException("There should be even number of persons.")
+        throw IllegalArgumentException("There should be even number of players.")
     val id = newId()
     return Game(id, settings, GameState.GatheringParty, emptyMap())
 }

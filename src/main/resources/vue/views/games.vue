@@ -3,7 +3,7 @@
         <div>
             <ul class="user-overview-list">
                 <li v-for="game in games">
-                    <a :href="`/games/${game.id}`">{{game.settings.title}} ({{game.settings.wordsCount}} words, {{game.settings.personsCount}} persons)</a>
+                    <a :href="`/games/${game.id}`">{{game.settings.title}} ({{game.settings.wordsCount}} words, {{game.settings.playersCount}} players)</a>
                 </li>
             </ul>
         </div>
@@ -12,7 +12,7 @@
             <h3>New game</h3>
             <input v-model="newGame.title" placeholder="New game name">
             <input type="number" v-model.number="newGame.wordsCount" placeholder="Words count">
-            <input type="number" v-model.number="newGame.personsCount" placeholder="Persons count">
+            <input type="number" v-model.number="newGame.playersCount" placeholder="Players count">
             <button v-on:click="createGame">Create new game</button>
             <p>debug: {{ newGame }}</p>
         </div>
@@ -23,7 +23,7 @@
         return {
             title: "",
             wordsCount: 5,
-            personsCount: 6
+            playersCount: 6
         };
     };
 
