@@ -8,14 +8,14 @@ import org.slf4j.LoggerFactory
 
 object GamesController {
     private val logger = LoggerFactory.getLogger(GamesController::class.java)
-    const val SharedStateAttributeKey = "SharedStateAttributeKey"
+    private const val SharedStateAttributeKey = "SharedStateAttributeKey"
 
     fun getAll(ctx: Context) {
-        ctx.json(gamesInMemoryStore)
+        ctx.json(GamesInMemoryStore.allGames())
     }
 
     fun getOne(ctx: Context) {
-        val game = gamesInMemoryStore.get(gameIdFromPath(ctx)) ?: throw NotFoundResponse()
+        val game = GamesInMemoryStore.byId(gameIdFromPath(ctx)) ?: throw NotFoundResponse()
         ctx.json(game)
     }
 
@@ -28,8 +28,7 @@ object GamesController {
     fun createGame(ctx: Context) {
         val settings = ctx.body<GameSettings>()
         val statusCode = try {
-            val game = model.game.newGame(settings)
-            gamesInMemoryStore[game.id] = game
+            val game = GamesInMemoryStore.newGame(settings)
             logger.info("Created game with id '${game.id}'.")
             201
         } catch (e: Exception) {
@@ -41,13 +40,10 @@ object GamesController {
 
     fun joinGame(ctx: Context) {
         val name = ctx.body()
-        val game = gamesInMemoryStore[gameIdFromPath(ctx)] ?: throw NotFoundResponse()
         val statusCode = try {
-            val player = model.game.newPlayer(name)
-            val updatedGame = model.game.joinGame(game, player)
-            gamesInMemoryStore[game.id] = updatedGame
-            WebSocketController.broadcastGameState(updatedGame)
-            ctx.json(GameContext(updatedGame, player.id))
+            val updatedGameContext = GamesInMemoryStore.joinGame(gameIdFromPath(ctx), name)
+            WebSocketController.broadcastGameState(updatedGameContext.game)
+            ctx.json(updatedGameContext)
             200
         } catch (e: Exception) {
             logger.error("Error while creating game.", e)
@@ -75,7 +71,7 @@ object GamesController {
     }
 
     private fun gameContextFromPath(ctx: Context): GameContext {
-        val game = gamesInMemoryStore[gameIdFromPath(ctx)] ?: throw NotFoundResponse()
+        val game = GamesInMemoryStore.byId(gameIdFromPath(ctx)) ?: throw NotFoundResponse()
         val player = game.players[playerIdFromPath(ctx)] ?: throw NotFoundResponse()
         return GameContext(game, player.id)
     }
