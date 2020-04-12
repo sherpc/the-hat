@@ -3,7 +3,7 @@ package model.game
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-data class GameSettings(val title: String, val wordsCount: Int, val personsCount: Int)
+data class GameSettings(val title: String, val wordsCount: Int, val playersCount: Int)
 
 enum class PlayerState {
     SelectingWords, ReadyToJoin
@@ -26,7 +26,7 @@ fun newId(): String {
 }
 
 fun newGame(settings: GameSettings): Game {
-    if (settings.personsCount % 2 != 0)
+    if (settings.playersCount % 2 != 0)
         throw IllegalArgumentException("There should be even number of persons.")
     val id = newId()
     return Game(id, settings, GameState.GatheringParty, emptyMap())
@@ -37,13 +37,13 @@ fun newPlayer(name: String): Player {
 }
 
 fun joinGame(game: Game, player: Player): Game {
-    Thread.sleep(TimeUnit.SECONDS.toMillis(1))
+    // Thread.sleep(TimeUnit.SECONDS.toMillis(1))
     if (game.state != GameState.GatheringParty)
         throw IllegalArgumentException("Game already started.")
-    if (game.players.size >= game.settings.personsCount)
+    if (game.players.size >= game.settings.playersCount)
         throw IllegalArgumentException("Game already full of players.")
     val players = game.players + Pair(player.id, player)
-    val newGameState = if (players.size == game.settings.personsCount) GameState.BuildingDeck else game.state
+    val newGameState = if (players.size == game.settings.playersCount) GameState.BuildingDeck else game.state
     return game.copy(players = players, state = newGameState)
 }
 

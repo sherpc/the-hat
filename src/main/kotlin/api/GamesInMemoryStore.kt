@@ -3,11 +3,12 @@ package api
 import io.javalin.http.NotFoundResponse
 import model.game.Game
 import model.game.GameSettings
-
+import java.util.concurrent.locks.ReentrantLock
+import kotlin.concurrent.withLock
 
 object GamesInMemoryStore {
-    private val testGame = model.game.newGame(GameSettings("Тестовая", 7, 6))
-    private val games = mutableMapOf(testGame.id to testGame)
+    private val games = mutableMapOf<String, Game>()
+    private val gameLocks = mutableMapOf<String, ReentrantLock>()
 
     fun allGames(): Map<String, Game> {
         return games
@@ -20,14 +21,22 @@ object GamesInMemoryStore {
     fun newGame(settings: GameSettings): Game {
         val game = model.game.newGame(settings)
         games[game.id] = game
+        gameLocks[game.id] = ReentrantLock()
         return game
     }
 
     fun joinGame(gameId: String, name: String): GameContext {
-        val game = games[gameId] ?: throw NotFoundResponse()
-        val player = model.game.newPlayer(name)
-        val updatedGame = model.game.joinGame(game, player)
-        games[game.id] = updatedGame
-        return GameContext(updatedGame, player.id)
+        return updateGameWithLock(gameId) {
+            val game = games[gameId] ?: throw NotFoundResponse()
+            val player = model.game.newPlayer(name)
+            val updatedGame = model.game.joinGame(game, player)
+            games[game.id] = updatedGame
+            GameContext(updatedGame, player.id)
+        }
+    }
+
+    private fun <T> updateGameWithLock(gameId: String, updateFn: () -> T): T {
+        val gameLock = gameLocks[gameId] ?: throw NotFoundResponse()
+        return gameLock.withLock { updateFn() }
     }
 }

@@ -1,4 +1,5 @@
 import api.GamesController
+import api.GamesInMemoryStore
 import api.WebSocketController
 import io.javalin.Javalin
 import io.javalin.websocket.WsContext
@@ -11,11 +12,15 @@ import io.javalin.apibuilder.ApiBuilder.*
 import io.javalin.http.Context
 import io.javalin.plugin.rendering.vue.JavalinVue
 import io.javalin.plugin.rendering.vue.VueComponent
+import model.game.GameSettings
 
 // import com.google.gson.Gson
 
 
 fun main(args: Array<String>) {
+    // add test game for debug
+    GamesInMemoryStore.newGame(GameSettings("Тестовая", 7, 6))
+    // start web server
     val app = Javalin.create {
         it.enableWebjars()
         // it.addStaticFiles("/public")
