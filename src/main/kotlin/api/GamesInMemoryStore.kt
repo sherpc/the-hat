@@ -26,17 +26,23 @@ object GamesInMemoryStore {
     }
 
     fun joinGame(gameId: String, name: String): GameContext {
-        return updateGameWithLock(gameId) {
-            val game = games[gameId] ?: throw NotFoundResponse()
-            val player = model.game.newPlayer(name)
-            val updatedGame = model.game.joinGame(game, player)
-            games[game.id] = updatedGame
-            GameContext(updatedGame, player.id)
-        }
+        val player = model.game.newPlayer(name)
+        val updatedGame = updateGameWithLock(gameId) { it.joinGame(player) }
+        return GameContext(updatedGame, player.id)
     }
 
-    private fun <T> updateGameWithLock(gameId: String, updateFn: () -> T): T {
+    fun setWords(gameId: String, playerId: String, newWords: Set<String>): GameContext {
+        val updatedGame = updateGameWithLock(gameId) { it.setPlayerWords(playerId, newWords) }
+        return GameContext(updatedGame, playerId)
+    }
+
+    private fun updateGameWithLock(gameId: String, updateFn: (game: Game) -> Game): Game {
         val gameLock = gameLocks[gameId] ?: throw NotFoundResponse()
-        return gameLock.withLock { updateFn() }
+        return gameLock.withLock {
+            val game = games[gameId] ?: throw NotFoundResponse()
+            val updatedGame = updateFn(game)
+            games[game.id] = updatedGame
+            updatedGame
+        }
     }
 }

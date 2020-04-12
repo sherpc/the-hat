@@ -40,20 +40,30 @@ object GamesController {
 
     fun joinGame(ctx: Context) {
         val name = ctx.body()
-        val statusCode = try {
-            val updatedGameContext = GamesInMemoryStore.joinGame(gameIdFromPath(ctx), name)
-            WebSocketController.broadcastGameState(updatedGameContext.game)
-            ctx.json(updatedGameContext)
-            200
-        } catch (e: Exception) {
-            logger.error("Error while creating game.", e)
-            400
+        updateGameAndBroadcast(ctx) {
+            GamesInMemoryStore.joinGame(gameIdFromPath(ctx), name)
         }
-        ctx.status(statusCode)
     }
 
     fun setWords(ctx: Context) {
         val gameContext = gameContextFromPath(ctx)
+        val words = ctx.body<Set<String>>()
+        updateGameAndBroadcast(ctx) {
+            GamesInMemoryStore.setWords(gameContext.game.id, gameContext.playerId, words)
+        }
+    }
+
+    private fun updateGameAndBroadcast(ctx: Context, updateFn: () -> GameContext) {
+        val statusCode = try {
+            val updatedGameContext = updateFn()
+            WebSocketController.broadcastGameState(updatedGameContext.game)
+            ctx.json(updatedGameContext)
+            200
+        } catch (e: Exception) {
+            logger.error("Error while updating game.", e)
+            500
+        }
+        ctx.status(statusCode)
     }
 
     fun stateFunction(ctx: Context): Map<String, Any> {

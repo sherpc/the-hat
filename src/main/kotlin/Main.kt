@@ -19,7 +19,13 @@ import model.game.GameSettings
 
 fun main(args: Array<String>) {
     // add test game for debug
-    GamesInMemoryStore.newGame(GameSettings("Тестовая", 7, 6))
+    val g = GamesInMemoryStore.newGame(GameSettings("Тестовая", 2, 4))
+    val vasyaId = GamesInMemoryStore.joinGame(g.id, "vasya").playerId
+    GamesInMemoryStore.setWords(g.id, vasyaId, setOf("hello", "world"))
+    val mashaId = GamesInMemoryStore.joinGame(g.id, "masha").playerId
+    GamesInMemoryStore.setWords(g.id, mashaId, setOf("привет", "стул"))
+    val sashaId = GamesInMemoryStore.joinGame(g.id, "sasha").playerId
+    GamesInMemoryStore.setWords(g.id, sashaId, setOf("лампа", "закат"))
     // start web server
     val app = Javalin.create {
         it.enableWebjars()
@@ -50,6 +56,11 @@ fun main(args: Array<String>) {
                     get(GamesController::getOne)
                     path("join") {
                         post(GamesController::joinGame)
+                    }
+                    path(":player-id") {
+                        path("setWords") {
+                            post(GamesController::setWords)
+                        }
                     }
                 }
             }

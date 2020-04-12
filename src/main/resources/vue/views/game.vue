@@ -5,8 +5,17 @@
             <div v-if="game">
                 <div>game id / title: {{game.id}} / {{game.settings.title}}</div>
                 <div>capacity: {{playersCount}} / {{game.settings.playersCount}}</div>
+                <div>words: {{game.settings.wordsCount}}</div>
 
-                <div v-if="player">game board, hello {{player.name}}!</div>
+                <div v-if="player">
+                    <selecting-words
+                            v-if="player.state == 'SelectingWords'"
+                            v-bind:words-count="game.settings.wordsCount"
+                            v-bind:game-id="game.id"
+                            v-bind:player="player">
+                    </selecting-words>
+                    <div v-else>game board, hello {{player.name}}!</div>
+                </div>
 
                 <div v-else>
                     <new-player v-if="availableToJoin"
