@@ -14,7 +14,10 @@
                             v-bind:game-id="game.id"
                             v-bind:player="player">
                     </selecting-words>
-                    <div v-else>game board, hello {{player.name}}!</div>
+                    <game-board
+                        v-if="player.state == 'ReadyToPlay'"
+                        v-bind:game="game"
+                        v-bind:player-id="player.id"></game-board>
                 </div>
 
                 <div v-else>

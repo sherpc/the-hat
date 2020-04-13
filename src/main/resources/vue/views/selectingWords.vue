@@ -25,21 +25,13 @@
             wordsCount: Number
         },
         methods: {
-            // joinGame() {
-            //     const name = this.name && this.name.trim();
-            //     if (!this.name) {
-            //         return
-            //     }
-            //     this.$emit('joining');
-
-            // }
             wordsReady() {
                 this.loading = true;
                 this.$emit('words-ready', Array.from(this.wordsEditor));
                 Vue.http.post(`/api/games/${this.gameId}/${this.player.id}/setWords`, this.wordsEditor).then(response => {
                     return response.json();
                 }).then(gameContext => {
-
+                    // TODO here we could unblock UI, but new state will arrive in websocket
                 });
             }
         },

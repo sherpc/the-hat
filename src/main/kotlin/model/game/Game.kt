@@ -21,7 +21,8 @@ data class Game(
     val state: GameState,
     val players: Map<String, Player>,
     val deck: List<String>,
-    val teams: List<Pair<String, String>>) {
+    val teams: List<Pair<String, String>>,
+    val currentTeam: Int) {
 
     fun setPlayerWords(playerId: String, newWords: Set<String>): Game {
         if (settings.wordsCount != newWords.size)
@@ -63,10 +64,11 @@ data class Game(
     private fun startGame(): Game {
         val players = players.values
         val deck = players.fold(emptyList<String>()) { acc, player ->  acc + player.words}
-        val teams = players.shuffled().chunked(2) { twoPlayers -> Pair(twoPlayers[0].id, twoPlayers[1].id) }
+        val straightTeams = players.shuffled().chunked(2) { twoPlayers -> Pair(twoPlayers[0].id, twoPlayers[1].id) }
+        val reversedTeams = straightTeams.map { Pair(it.second, it.first)}
+        val teams = straightTeams + reversedTeams
         return copy(state = GameState.Playing, deck = deck, teams = teams)
     }
-
 }
 
 fun newId(): String {
@@ -77,7 +79,7 @@ fun newGame(settings: GameSettings): Game {
     if (settings.playersCount % 2 != 0)
         throw IllegalArgumentException("There should be even number of players.")
     val id = newId()
-    return Game(id, settings, GameState.GatheringParty, emptyMap(), emptyList(), emptyList())
+    return Game(id, settings, GameState.GatheringParty, emptyMap(), emptyList(), emptyList(), 0)
 }
 
 fun newPlayer(name: String): Player {
