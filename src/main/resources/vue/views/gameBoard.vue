@@ -6,14 +6,18 @@
             <br/>
             game board, hello {{player.name}}!
         </div>
-        <div>
-            <h3>Teams queue</h3>
-            <ul>
-                <li v-for="pair in teamsQueue">
-                    <bold v-if="pair.active">(*)</bold>
-                    {{pair.explainer.name}} → {{pair.listener.name}}
-                </li>
-            </ul>
+        <div v-if="game.state == 'GatheringParty'"><h4>Awaiting of other players to join.</h4></div>
+        <div v-if="game.state == 'Playing'">
+            <div>
+                <h3>Teams queue</h3>
+                <ul>
+                    <li v-for="pair in teamsQueue">
+                        <strong v-if="pair.active">(*)</strong>
+                        {{pair.explainer.name}} → {{pair.listener.name}}
+                    </li>
+                </ul>
+            </div>
+            <component v-bind:is="playerState" v-bind:active-pair="activePair"></component>
         </div>
     </div>
 </template>
@@ -22,7 +26,7 @@
         template: "#gameBoard",
         props: {
             game: Object,
-            playerId: Object,
+            playerId: String,
         },
         methods: {
             playerById(id) {
@@ -39,8 +43,19 @@
                     }
                 });
             },
+            activePair() {
+                return this.teamsQueue.filter(p => p.active)[0];
+            },
             player() {
                 return this.playerById(this.playerId);
+            },
+            playerState() {
+                if (this.activePair.explainer.id == this.playerId)
+                    return 'explainer';
+                else if (this.activePair.listener.id == this.playerId)
+                    return 'listener-player';
+                else
+                    return 'observer';
             }
         }
     });

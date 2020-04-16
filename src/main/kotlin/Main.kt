@@ -29,7 +29,7 @@ fun main(args: Array<String>) {
     // start web server
     val app = Javalin.create {
         it.enableWebjars()
-        // it.addStaticFiles("/public")
+        it.addStaticFiles("/public")
     }.ws("/games/:game-id/:player-id") { ws ->
         ws.onConnect(WebSocketController::onConnect)
         ws.onClose(WebSocketController::onClose)
