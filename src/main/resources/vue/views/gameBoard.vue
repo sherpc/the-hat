@@ -17,7 +17,9 @@
                     </li>
                 </ul>
             </div>
-            <component v-bind:is="playerState" v-bind:active-pair="activePair"></component>
+            <component v-bind:is="playerState"
+                       v-bind:active-pair="activePair"
+                       v-bind:initial-deck="game.deck"></component>
         </div>
     </div>
 </template>
