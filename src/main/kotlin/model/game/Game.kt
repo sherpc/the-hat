@@ -112,8 +112,15 @@ data class Game(
     }
 }
 
-fun newId(): String {
-    return UUID.randomUUID().toString()
+private var existingIds: Set<String> = emptySet()
+
+fun newId(retry: Int = 0): String {
+    if (retry > 50)
+        return UUID.randomUUID().toString()
+    val tryId = UUID.randomUUID().toString().split("-")[0]
+    if (existingIds.contains(tryId))
+        return newId(retry + 1)
+    return tryId
 }
 
 fun newGame(settings: GameSettings): Game {
