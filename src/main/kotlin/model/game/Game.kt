@@ -63,7 +63,7 @@ data class Game(
     }
 
     fun joinGame(player: Player): Game {
-        Thread.sleep(TimeUnit.MILLISECONDS.toMillis(500))
+        // Thread.sleep(TimeUnit.MILLISECONDS.toMillis(500))
         if (state != GameState.GatheringParty)
             throw IllegalArgumentException("Game already started.")
         if (players.size >= settings.playersCount)
