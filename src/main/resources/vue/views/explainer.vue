@@ -11,6 +11,7 @@
                 <div>Next word: <i>{{randomWord}}</i></div>
                 <div><button v-on:click="onNextWord">Next!</button></div>
                 <div><button v-on:click="onNextTeam">Change player</button></div>
+                <timer v-bind:duration="5" v-on:timer-finished="onNextTeam"></timer>
             </div>
             <div v-else>Game finished!</div>
         </div>
@@ -46,6 +47,9 @@
             onNextTeam() {
                 this.awaitingPlayerChange = true;
                 this.$emit('next-team');
+            },
+            onTimerFinished() {
+                console.log('boom');
             }
         },
         computed: {
