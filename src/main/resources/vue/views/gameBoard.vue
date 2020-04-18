@@ -1,27 +1,35 @@
 <template id="gameBoard">
     <div>
-        <div>
-            <h3>Game state</h3>
-            game state: {{game.state}} <i v-if="game.state == 'Playing'">({{game.round}})</i>
-            <br/>
-            game board, hello {{player.name}}!
-        </div>
-        <div v-if="game.state == 'GatheringParty'"><h4>Awaiting of other players to join.</h4></div>
-        <div v-if="game.state == 'Playing'">
-            <div>
-                <h3>Teams queue</h3>
-                <ul>
-                    <li v-for="pair in teamsQueue">
-                        <strong v-if="pair.active">(*)</strong>
-                        {{pair.explainer.name}} → {{pair.listener.name}}
-                    </li>
-                </ul>
+<!--        <div>-->
+<!--            <h3>Game state</h3>-->
+<!--            game state: {{game.state}} <i v-if="game.state == 'Playing'">({{game.round}})</i>-->
+<!--            <br/>-->
+<!--            game board, hello {{player.name}}!-->
+<!--        </div>-->
+        <div v-if="game.state == 'GatheringParty'">
+            <div class="pure-g">
+                <div class="pure-u-1">Ждем, пока все соберутся и введут слова. <br/> Готовы играть {{playersCount}} из {{game.settings.playersCount}} игроков.</div>
             </div>
-            <component v-bind:is="playerState"
-                       v-bind:active-pair="activePair"
-                       v-bind:initial-deck="game.deck"
-                       v-on:remaining-deck="onRemainingDeck"
-                       v-on:next-team="onNextTeam"></component>
+        </div>
+        <div v-if="game.state == 'Playing'">
+            <div class="pure-g">
+                <div class="pure-u-1" v-bind:class="playerIsActive ? '' : 'pure-u-lg-1-2'">
+                    <component v-bind:is="playerState"
+                               v-bind:active-pair="activePair"
+                               v-bind:initial-deck="game.deck"
+                               v-on:remaining-deck="onRemainingDeck"
+                               v-on:next-team="onNextTeam"></component>
+                </div>
+                <div v-if="!playerIsActive" class="pure-u-1 pure-u-lg-1-2">
+                    <h4 class="is-center">Очередность команд</h4>
+                    <ul>
+                        <li v-for="pair in teamsQueue">
+                            <i v-if="pair.active" class="fa fa-play"></i>
+                            {{pair.explainer.name}} → {{pair.listener.name}}
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
     </div>
 </template>
@@ -48,6 +56,9 @@
             }
         },
         computed: {
+            playersCount() {
+                return Object.keys(this.game.players).length;
+            },
             teamsQueue() {
                 return this.game.teams.map((team, i) => {
                     return {
@@ -70,6 +81,9 @@
                     return 'listener-player';
                 else
                     return 'observer';
+            },
+            playerIsActive() {
+                return this.playerState != 'observer';
             }
         }
     });

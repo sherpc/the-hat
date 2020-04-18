@@ -1,8 +1,18 @@
 <template id="timer">
-    <div>
-        <div>remaining seconds: {{secondsRemaining}}</div>
-        <div><button v-on:click="timeoutId ? pause() : start()">{{playPauseButtonText}}</button></div>
-    </div>
+    <form class="pure-form pure-form-stacked">
+        <fieldset>
+            <div class="pure-g">
+                <div class="pure-u-1-2">
+                    <button type="submit" class="pure-button button-warning" style="margin: 0" v-on:click.prevent="timeoutId ? pause() : start()">
+                        <i class="fa" v-bind:class="playPauseClass"></i>
+                    </button>
+                </div>
+                <div class="pure-u-1-2">
+                    <label class="seconds-remaining is-center">Осталось сек: {{secondsRemaining}}</label>
+                </div>
+            </div>
+        </fieldset>
+    </form>
 </template>
 <script>
     Vue.component("timer", {
@@ -42,8 +52,8 @@
             }
         },
         computed: {
-            playPauseButtonText() {
-                return this.timeoutId ? 'pause' : 'play';
+            playPauseClass() {
+                return this.timeoutId ? 'fa-pause' : 'fa-play';
             }
         },
         created() {
@@ -55,3 +65,8 @@
         }
     });
 </script>
+<style>
+    .seconds-remaining {
+        font-size: 20px;
+    }
+</style>

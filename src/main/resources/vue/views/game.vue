@@ -1,30 +1,30 @@
 <template id="game">
-    <div>
-        <div v-bind:style="{ display: showLoading }">...LOADING...</div>
-        <div v-bind:style="{ display: showGameBoard }">
-            <div v-if="game">
-                <div>game id / title: {{game.id}} / {{game.settings.title}}</div>
-                <div>capacity: {{playersCount}} / {{game.settings.playersCount}}</div>
-                <div>words: {{game.settings.wordsCount}}</div>
+    <div class="pure-g">
+        <div class="pure-u-1">
+            <div v-bind:style="{ display: showLoading }">...LOADING...</div>
+            <div v-bind:style="{ display: showGameBoard }">
+                <div v-if="game">
+                    <h4 class="is-center">{{game.settings.title}} (раунд: {{roundDescription}})</h4>
 
-                <div v-if="player">
-                    <selecting-words
-                            v-if="player.state == 'SelectingWords'"
-                            v-bind:words-count="game.settings.wordsCount"
-                            v-bind:game-id="game.id"
-                            v-bind:player="player">
-                    </selecting-words>
-                    <game-board
-                        v-if="player.state == 'ReadyToPlay'"
-                        v-bind:game="game"
-                        v-bind:player-id="player.id"></game-board>
-                </div>
-
-                <div v-else>
-                    <new-player v-if="availableToJoin"
+                    <div v-if="player">
+                        <selecting-words
+                                v-if="player.state == 'SelectingWords'"
+                                v-bind:words-count="game.settings.wordsCount"
                                 v-bind:game-id="game.id"
-                                v-on:game-joined="onGameJoined"></new-player>
-                    <div v-else>Game already started.</div>
+                                v-bind:player="player">
+                        </selecting-words>
+                        <game-board
+                                v-if="player.state == 'ReadyToPlay'"
+                                v-bind:game="game"
+                                v-bind:player-id="player.id"></game-board>
+                    </div>
+
+                    <div v-else>
+                        <new-player v-if="availableToJoin"
+                                    v-bind:game-id="game.id"
+                                    v-on:game-joined="onGameJoined"></new-player>
+                        <div v-else>Игра уже началась :( <br/> Создай новую на главной!</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -59,9 +59,6 @@
             }
         },
         computed: {
-            playersCount() {
-                return Object.keys(this.game.players).length;
-            },
             availableToJoin() {
                 return this.game.state == 'GatheringParty';
             },
@@ -74,6 +71,17 @@
             player() {
                 if (this.playerId) {
                     return this.game.players[this.playerId];
+                }
+                return null;
+            },
+            roundDescription() {
+                const round = this?.game?.round;
+                if (round) {
+                    switch (round) {
+                        case 'DescribeInWords': return 'словами';
+                        case 'Words': return 'крокодил';
+                        case 'DescribeInOneWord': return 'одним словом';
+                    }
                 }
                 return null;
             }

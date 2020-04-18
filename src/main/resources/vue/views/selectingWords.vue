@@ -1,13 +1,14 @@
 <template id="selectingWords">
-    <div>
-        <p>select words, {{player.name}}</p>
-        <div>
-            <div v-for="wordIndex in wordsCount">
-                <label>word # {{wordIndex}}</label>
-                <input v-model="wordsEditor[wordIndex-1]" placeholder="Write word">
-            </div>
+    <div class="pure-g">
+        <div class="pure-u-1">
+            <p>{{player.name}}, добавь в шляпу слова:</p>
+            <form class="pure-form pure-form-stacked">
+                <div v-for="wordIndex in wordsCount">
+                    <input type="text" class="pure-u-1 pure-u-lg-1-4" v-model="wordsEditor[wordIndex-1]" v-bind:placeholder="'слово №' + wordIndex">
+                </div>
+                <button type="submit" class="pure-button pure-button-primary" :disabled="!allWordsFilledIn || loading" v-on:click.prevent="wordsReady">Готово!</button>
+            </form>
         </div>
-        <button :disabled="!allWordsFilledIn || loading" v-on:click="wordsReady">Ready!</button>
     </div>
 </template>
 <script>
@@ -30,6 +31,9 @@
                 this.$emit('words-ready', Array.from(this.wordsEditor));
                 Vue.http.post(`/api/games/${this.gameId}/${this.player.id}/setWords`, this.wordsEditor).then(response => {
                     return response.json();
+                }, err => {
+                    console.log(err);
+                    this.loading = false;
                 }).then(gameContext => {
                     // TODO here we could unblock UI, but new state will arrive in websocket
                 });

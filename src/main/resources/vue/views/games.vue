@@ -1,20 +1,46 @@
 <template id="games">
     <div>
-        <div>
-            <ul class="user-overview-list">
-                <li v-for="game in games">
-                    <a :href="`/games/${game.id}`">{{game.settings.title}} ({{game.settings.wordsCount}} words, {{game.settings.playersCount}} players)</a>
-                </li>
-            </ul>
+        <div class="pure-g">
+            <div class="pure-u-1">
+                <form class="pure-form">
+                    <fieldset>
+                        <legend>Новая игра</legend>
+                        <input type="text" class="pure-input-1-1 pure-input-lg-1-4" v-model="newGame.title" placeholder="Название игры" required>
+                        <label for="wordsCount">
+                            <input id="wordsCount" style="width: 50px; display: inline" type="number" v-model.number="newGame.wordsCount" required> слов
+                        </label>
+                        <label for="playersCount">
+                            <input id="playersCount" style="width: 50px; display: inline" type="number" v-model.number="newGame.playersCount" placeholder="Players count" required> игроков
+                        </label>
+
+
+                        <button v-on:click.prevent="createGame" type="submit" class="pure-button button-success">Создать игру</button>
+                    </fieldset>
+                </form>
+            </div>
         </div>
-        <hr/>
-        <div>
-            <h3>New game</h3>
-            <input v-model="newGame.title" placeholder="New game name">
-            <input type="number" v-model.number="newGame.wordsCount" placeholder="Words count">
-            <input type="number" v-model.number="newGame.playersCount" placeholder="Players count">
-            <button v-on:click="createGame">Create new game</button>
-            <p>debug: {{ newGame }}</p>
+        <div class="pure-g">
+            <div class="pure-u-1">
+                <form class="pure-form">
+                    <legend>Игры</legend>
+                </form>
+                <table class="pure-table pure-table-horizontal">
+                    <thead>
+                        <tr>
+                            <th>Название</th>
+                            <th><i class="fa fa-users"></i></th>
+                            <th>Статус</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="game in games">
+                            <td><a :href="`/games/${game.id}`">{{game.settings.title}}</a></td>
+                            <td>{{game.settings.playersCount}}</td>
+                            <td>{{gameStateText(game.state)}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </template>
@@ -55,21 +81,17 @@
                     .then(res => res.json())
                     .then(res => this.games = res)
                     .catch(e => console.error("Error while fetching games: ", e))
+            },
+            gameStateText(state) {
+                switch (state) {
+                    case 'GatheringParty': return 'Сбор игроков';
+                    case 'Playing': return 'Игра началась';
+                    case 'Finished': return 'Игра закончена';
+                }
             }
         }
     });
 </script>
 <style>
-    ul.user-overview-list {
-        padding: 0;
-        list-style: none;
-    }
-    ul.user-overview-list a {
-        display: block;
-        padding: 16px;
-        border-bottom: 1px solid #ddd;
-    }
-    ul.user-overview-list a:hover {
-        background: #00000010;
-    }
+
 </style>

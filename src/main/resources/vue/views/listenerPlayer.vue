@@ -1,8 +1,7 @@
 <template id="listenerPlayer">
-    <div>
-        <h4>You are listenerPlayer</h4>
-        Now <i>{{activePair.explainer.name}}</i> explains words to you.
-    </div>
+    <p class="is-center">
+        Сейчас <strong>{{activePair.explainer.name}}</strong> объясняет слова тебе.
+    </p>
 </template>
 <script>
     Vue.component("listenerPlayer", {

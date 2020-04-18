@@ -4,16 +4,20 @@
             Awaiting switching to next player...
         </div>
         <div v-else>
-            <h4>You are explainer</h4>
-            Now you explains words to <i>{{activePair.listener.name}}</i>.
-            <button v-if="awaitingPlayer" v-on:click="onReady">Ready!</button>
+            <p class="is-center">Сейчас ты объясняешь слова игроку <strong>{{activePair.listener.name}}</strong>.</p>
+            <form v-if="awaitingPlayer" class="pure-form">
+                <button type="submit" class="pure-button button-success center-by-horizontal" v-on:click.prevent="onReady">Готов объяснять!</button>
+            </form>
             <div v-else-if="deck.length > 0">
-                <div>Next word: <i>{{randomWord}}</i></div>
-                <div><button v-on:click="onNextWord">Next!</button></div>
-                <div><button v-on:click="onNextTeam">Change player</button></div>
+                <p class="word-to-explain is-center">{{randomWord}}</p>
+                <form class="pure-form">
+                    <button type="submit" class="pure-button button-success center-by-horizontal" v-on:click.prevent="onNextWord">Next!</button>
+                </form>
+                <div></div>
+<!--                <div><button v-on:click="onNextTeam">Change player</button></div>-->
                 <timer v-bind:duration="5" v-on:timer-finished="onNextTeam"></timer>
             </div>
-            <div v-else>Game finished!</div>
+            <div v-else>Игра окончена!</div>
         </div>
     </div>
 </template>
@@ -79,3 +83,8 @@
     }
 
 </script>
+<style>
+    .word-to-explain {
+        font-size: 25px;
+    }
+</style>
