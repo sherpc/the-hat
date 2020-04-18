@@ -1,6 +1,7 @@
 <template id="timer">
     <div>
-        remaining seconds: {{secondsRemaining}}
+        <div>remaining seconds: {{secondsRemaining}}</div>
+        <div><button v-on:click="timeoutId ? pause() : start()">{{playPauseButtonText}}</button></div>
     </div>
 </template>
 <script>
@@ -8,7 +9,7 @@
         template: "#timer",
         data: () => ({
             secondsRemaining: 0,
-            timeoutId: null
+            timeoutId: null,
         }),
         props: {
             duration: {
@@ -20,20 +21,37 @@
                 }
             }
         },
+        methods: {
+            start() {
+                this.timeoutId = setInterval(() => {
+                    this.secondsRemaining -= 1;
+                    if (this.secondsRemaining === 0) {
+                        clearInterval(this.timeoutId);
+                        this.$emit('timer-finished')
+                    }
+                }, 1000);
+            },
+            pause() {
+                this.clearTimeoutId();
+            },
+            clearTimeoutId() {
+                if (this.timeoutId) {
+                    clearInterval(this.timeoutId);
+                    this.timeoutId = null;
+                }
+            }
+        },
+        computed: {
+            playPauseButtonText() {
+                return this.timeoutId ? 'pause' : 'play';
+            }
+        },
         created() {
             this.secondsRemaining = this.duration;
-            this.timeoutId = setInterval(() => {
-                this.secondsRemaining -= 1;
-                if (this.secondsRemaining === 0) {
-                    clearInterval(this.timeoutId);
-                    this.$emit('timer-finished')
-                }
-            }, 1000);
+            this.start();
         },
         beforeDestroy() {
-            if (this.timeoutId) {
-                clearInterval(this.timeoutId);
-            }
+            this.clearTimeoutId();
         }
     });
 </script>
