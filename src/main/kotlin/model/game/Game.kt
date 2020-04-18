@@ -15,13 +15,19 @@ enum class GameState {
 
 data class Player(val id: String, val name: String, val words: Set<String>, val state: PlayerState)
 
+data class Team(val explainerId: String, val listenerId: String) {
+    fun reverse(): Team {
+        return copy(explainerId = listenerId, listenerId = explainerId)
+    }
+}
+
 data class Game(
     val id: String,
     val settings: GameSettings,
     val state: GameState,
     val players: Map<String, Player>,
-    val deck: List<String>,
-    val teams: List<Pair<String, String>>,
+    val deck: Set<String>,
+    val teams: List<Team>,
     val currentTeam: Int) {
 
     fun setPlayerWords(playerId: String, newWords: Set<String>): Game {
@@ -30,6 +36,14 @@ data class Game(
         return updatePlayer(playerId) {
             it.copy(words = newWords.toSet(), state = PlayerState.ReadyToPlay)
         }.startIfReady()
+    }
+
+    fun setDeck(playerId: String, newDeck: Set<String>): Game {
+        val currentPlayer = players[playerId]!!
+        if (teams[currentTeam].explainerId != currentPlayer.id)
+            throw java.lang.IllegalArgumentException("Current player not explainer!")
+
+        return copy(deck = newDeck)
     }
 
     fun joinGame(player: Player): Game {
@@ -63,9 +77,9 @@ data class Game(
 
     private fun startGame(): Game {
         val players = players.values
-        val deck = players.fold(emptyList<String>()) { acc, player ->  acc + player.words}
-        val straightTeams = players.shuffled().chunked(2) { twoPlayers -> Pair(twoPlayers[0].id, twoPlayers[1].id) }
-        val reversedTeams = straightTeams.map { Pair(it.second, it.first)}
+        val deck = players.fold(emptyList<String>()) { acc, player ->  acc + player.words}.toSet()
+        val straightTeams = players.shuffled().chunked(2) { twoPlayers -> Team(twoPlayers[0].id, twoPlayers[1].id) }
+        val reversedTeams = straightTeams.map(Team::reverse)
         val teams = straightTeams + reversedTeams
         return copy(state = GameState.Playing, deck = deck, teams = teams)
     }
@@ -79,7 +93,7 @@ fun newGame(settings: GameSettings): Game {
     if (settings.playersCount % 2 != 0)
         throw IllegalArgumentException("There should be even number of players.")
     val id = newId()
-    return Game(id, settings, GameState.GatheringParty, emptyMap(), emptyList(), emptyList(), 0)
+    return Game(id, settings, GameState.GatheringParty, emptyMap(), emptySet(), emptyList(), 0)
 }
 
 fun newPlayer(name: String): Player {

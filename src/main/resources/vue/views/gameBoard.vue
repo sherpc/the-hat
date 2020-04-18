@@ -19,7 +19,8 @@
             </div>
             <component v-bind:is="playerState"
                        v-bind:active-pair="activePair"
-                       v-bind:initial-deck="game.deck"></component>
+                       v-bind:initial-deck="game.deck"
+                       v-on:remaining-deck="onRemainingDeck"></component>
         </div>
     </div>
 </template>
@@ -33,14 +34,19 @@
         methods: {
             playerById(id) {
                 return this.game.players[id];
+            },
+            onRemainingDeck(remainingDeck) {
+                Vue.http.post(`/api/games/${this.game.id}/${this.playerId}/remainingDeck`, remainingDeck).then(response => {
+                    return true;
+                }, err => console.error(err));
             }
         },
         computed: {
             teamsQueue() {
-                return this.game.teams.map((pair, i) => {
+                return this.game.teams.map((team, i) => {
                     return {
-                        explainer: this.playerById(pair.first),
-                        listener: this.playerById(pair.second),
+                        explainer: this.playerById(team.explainerId),
+                        listener: this.playerById(team.listenerId),
                         active: i == this.game.currentTeam
                     }
                 });

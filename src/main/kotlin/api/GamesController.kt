@@ -3,6 +3,7 @@ package api
 import io.javalin.http.Context
 import io.javalin.http.NotFoundResponse
 import io.javalin.plugin.rendering.vue.VueComponent
+import model.game.Game
 import model.game.GameSettings
 import org.slf4j.LoggerFactory
 
@@ -53,10 +54,22 @@ object GamesController {
         }
     }
 
-    private fun updateGameAndBroadcast(ctx: Context, updateFn: () -> GameContext) {
+    fun remainingDeck(ctx: Context) {
+        val gameContext = gameContextFromPath(ctx)
+        val deck = ctx.body<Set<String>>()
+        updateGameAndBroadcast(ctx) {
+            GamesInMemoryStore.setDeck(gameContext.game.id, gameContext.playerId, deck)
+        }
+    }
+
+    private fun updateGameAndBroadcast(ctx: Context, exceptPlayerId: String? = null, updateFn: () -> GameContext) {
         val statusCode = try {
             val updatedGameContext = updateFn()
-            WebSocketController.broadcastGameState(updatedGameContext.game)
+            if (exceptPlayerId != null) {
+                WebSocketController.broadcastToAllExcept(updatedGameContext.game, exceptPlayerId)
+            } else {
+                WebSocketController.broadcastGameState(updatedGameContext.game)
+            }
             ctx.json(updatedGameContext)
             200
         } catch (e: Exception) {

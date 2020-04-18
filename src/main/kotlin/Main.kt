@@ -61,6 +61,9 @@ fun main(args: Array<String>) {
                         path("setWords") {
                             post(GamesController::setWords)
                         }
+                        path("remainingDeck") {
+                            post(GamesController::remainingDeck)
+                        }
                     }
                 }
             }

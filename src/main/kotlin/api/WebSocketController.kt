@@ -35,6 +35,12 @@ object WebSocketController {
             .forEach { it.key.send(GameContext(game, it.value.playerId)) }
     }
 
+    fun broadcastToAllExcept(game: Game, exceptPlayerId: String) {
+        userPlayerContextMap
+            .filter { it.key.session.isOpen && it.value.gameId == game.id && it.value.playerId != exceptPlayerId }
+            .forEach { it.key.send(GameContext(game, it.value.playerId)) }
+    }
+
     private fun gameIdFromPath(ctx: WsContext): String {
         return ctx.pathParam(Constants.GameIdPathKey)
     }
