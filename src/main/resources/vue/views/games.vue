@@ -4,22 +4,26 @@
             <div class="pure-u-1">
                 <form class="pure-form">
                     <fieldset>
+                        <legend>Новая игра</legend>
                         <input type="text" class="pure-input-1-1 pure-input-lg-1-4" v-model="newGame.title" placeholder="Название игры" required>
                         <label for="wordsCount">
-                            <input id="wordsCount" style="width: 50px; display: inline" type="number" v-model.number="newGame.wordsCount" required> слов,
+                            <input id="wordsCount" style="width: 50px; display: inline" type="number" v-model.number="newGame.wordsCount" required> слов
                         </label>
                         <label for="playersCount">
-                            <input id="playersCount" style="width: 50px; display: inline" type="number" v-model.number="newGame.playersCount" placeholder="Players count" required> игроков,
+                            <input id="playersCount" style="width: 50px; display: inline" type="number" v-model.number="newGame.playersCount" placeholder="Players count" required> игроков
                         </label>
 
 
-                        <button v-on:click.prevent="createGame" type="submit" class="pure-button pure-button-primary">Создать игру</button>
+                        <button v-on:click.prevent="createGame" type="submit" class="pure-button button-success">Создать игру</button>
                     </fieldset>
                 </form>
             </div>
         </div>
         <div class="pure-g">
             <div class="pure-u-1">
+                <form class="pure-form">
+                    <legend>Игры</legend>
+                </form>
                 <table class="pure-table pure-table-horizontal">
                     <thead>
                         <tr>

@@ -16,6 +16,7 @@
             padding: 20px;
             background: white;
             border: none;
+            border-radius: 2px;
             box-shadow: rgba(60, 64, 67, 0.15) 0 1px 3px 1px;
         }
 
@@ -24,17 +25,22 @@
         }
 
         body {
-            background: beige;
+            background: beige url("/pattern-mirta-wallpaper.png");
         }
 
         .is-center {
             text-align: center;
         }
 
+        @font-face {
+            font-family: 'montserrat';
+            src: url('/fonts/montserrat-light.ttf') format('truetype'); /* Chrome 4+, Firefox 3.5, Opera 10+, Safari 3—5 */
+        }
+
         html, button, input, select, textarea,
         .pure-g [class *= "pure-u"] {
             /* Set your content font stack here: */
-            font-family: Georgia, Times, "Times New Roman", serif;
+            font-family: montserrat, sans-serif;
         }
 
         .button-success,
@@ -72,15 +78,15 @@
     @componentRegistration
 </head>
 <body>
-    <div class="header">
-        <div class="home-menu pure-menu pure-menu-horizontal">
-            <a class="pure-menu-heading" href="/">Шляпа 🎩</a>
+<!--    <div class="header">-->
+<!--        <div class="home-menu pure-menu pure-menu-horizontal">-->
+<!--            <a class="pure-menu-heading" href="/">Шляпа 🎩</a>-->
 
-            <!--<ul class="pure-menu-list">
-                <li class="pure-menu-item pure-menu-selected"><a href="#" class="pure-menu-link">Home</a></li>
-            </ul>-->
-        </div>
-    </div>
+<!--            &lt;!&ndash;<ul class="pure-menu-list">-->
+<!--                <li class="pure-menu-item pure-menu-selected"><a href="#" class="pure-menu-link">Home</a></li>-->
+<!--            </ul>&ndash;&gt;-->
+<!--        </div>-->
+<!--    </div>-->
     <div class="content-wrapper-external">
         <div class="content-wrapper-internal">
             <main id="main-vue" v-cloak>
