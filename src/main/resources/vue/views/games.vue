@@ -1,35 +1,38 @@
 <template id="games">
     <div>
         <div class="pure-g">
-            <div class="pure-u-1-2">
+            <div class="pure-u-1">
                 <form class="pure-form">
                     <fieldset>
-                        <legend>New game</legend>
-                        <input class="pure-input-1-4" v-model="newGame.title" placeholder="New game name">
-                        <input style="width: 50px" type="number" v-model.number="newGame.wordsCount" placeholder="Words count">
-                        <input style="width: 50px" type="number" v-model.number="newGame.playersCount" placeholder="Players count">
+                        <input type="text" class="pure-input-1-1 pure-input-lg-1-4" v-model="newGame.title" placeholder="Название игры" required>
+                        <label for="wordsCount">
+                            <input id="wordsCount" style="width: 50px; display: inline" type="number" v-model.number="newGame.wordsCount" required> слов,
+                        </label>
+                        <label for="playersCount">
+                            <input id="playersCount" style="width: 50px; display: inline" type="number" v-model.number="newGame.playersCount" placeholder="Players count" required> игроков,
+                        </label>
 
-                        <button v-on:click="createGame" type="submit" class="pure-button pure-button-primary">Create new game</button>
+
+                        <button v-on:click.prevent="createGame" type="submit" class="pure-button pure-button-primary">Создать игру</button>
                     </fieldset>
                 </form>
             </div>
         </div>
-        <hr/>
         <div class="pure-g">
             <div class="pure-u-1">
                 <table class="pure-table pure-table-horizontal">
                     <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>Words</th>
-                            <th>Players</th>
+                            <th>Название</th>
+                            <th><i class="fa fa-users"></i></th>
+                            <th>Статус</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-for="game in games">
                             <td><a :href="`/games/${game.id}`">{{game.settings.title}}</a></td>
-                            <td>{{game.settings.wordsCount}}</td>
                             <td>{{game.settings.playersCount}}</td>
+                            <td>{{gameStateText(game.state)}}</td>
                         </tr>
                     </tbody>
                 </table>
@@ -74,6 +77,13 @@
                     .then(res => res.json())
                     .then(res => this.games = res)
                     .catch(e => console.error("Error while fetching games: ", e))
+            },
+            gameStateText(state) {
+                switch (state) {
+                    case 'GatheringParty': return 'Сбор игроков';
+                    case 'Playing': return 'Игра началась';
+                    case 'Finished': return 'Игра закончена';
+                }
             }
         }
     });

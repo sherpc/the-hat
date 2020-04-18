@@ -1,7 +1,13 @@
 <template id="newPlayer">
-    <div>
-        <input v-model="name" placeholder="Your name">
-        <button v-on:click="joinGame">Join game</button>
+    <div class="pure-g">
+        <div class="pure-u-1">
+            <form class="pure-form">
+                <fieldset>
+                    <input type="text" v-model="name" placeholder="Твое имя">
+                    <button v-on:click.prevent="joinGame" type="submit" class="pure-button pure-button-primary">Зайти в игру</button>
+                </fieldset>
+            </form>
+        </div>
     </div>
 </template>
 <script>
