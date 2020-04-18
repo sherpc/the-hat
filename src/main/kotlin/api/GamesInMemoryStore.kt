@@ -41,6 +41,11 @@ object GamesInMemoryStore {
         return GameContext(updatedGame, playerId)
     }
 
+    fun nextTeam(gameId: String, playerId: String): GameContext {
+        val updatedGame = updateGameWithLock(gameId) { it.nextTeam(playerId) }
+        return GameContext(updatedGame, playerId)
+    }
+
     private fun updateGameWithLock(gameId: String, updateFn: (game: Game) -> Game): Game {
         val gameLock = gameLocks[gameId] ?: throw NotFoundResponse()
         return gameLock.withLock {

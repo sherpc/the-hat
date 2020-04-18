@@ -64,6 +64,9 @@ fun main(args: Array<String>) {
                         path("remainingDeck") {
                             post(GamesController::remainingDeck)
                         }
+                        path("nextTeam") {
+                            post(GamesController::nextTeam)
+                        }
                     }
                 }
             }

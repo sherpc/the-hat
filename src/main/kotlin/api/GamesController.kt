@@ -62,6 +62,13 @@ object GamesController {
         }
     }
 
+    fun nextTeam(ctx: Context) {
+        val gameContext = gameContextFromPath(ctx)
+        updateGameAndBroadcast(ctx) {
+            GamesInMemoryStore.nextTeam(gameContext.game.id, gameContext.playerId)
+        }
+    }
+
     private fun updateGameAndBroadcast(ctx: Context, exceptPlayerId: String? = null, updateFn: () -> GameContext) {
         val statusCode = try {
             val updatedGameContext = updateFn()

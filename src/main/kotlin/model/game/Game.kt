@@ -10,7 +10,11 @@ enum class PlayerState {
 }
 
 enum class GameState {
-    GatheringParty, Playing
+    GatheringParty, Playing, Finished
+}
+
+enum class Round {
+    DescribeInWords, Show, DescribeInOneWord
 }
 
 data class Player(val id: String, val name: String, val words: Set<String>, val state: PlayerState)
@@ -28,7 +32,8 @@ data class Game(
     val players: Map<String, Player>,
     val deck: Set<String>,
     val teams: List<Team>,
-    val currentTeam: Int) {
+    val currentTeam: Int,
+    val round: Round) {
 
     fun setPlayerWords(playerId: String, newWords: Set<String>): Game {
         if (settings.wordsCount != newWords.size)
@@ -39,11 +44,22 @@ data class Game(
     }
 
     fun setDeck(playerId: String, newDeck: Set<String>): Game {
-        val currentPlayer = players[playerId]!!
-        if (teams[currentTeam].explainerId != currentPlayer.id)
+        val currentPlayer = players[playerId]
+        if (currentPlayer == null || teams[currentTeam].explainerId != currentPlayer.id)
             throw java.lang.IllegalArgumentException("Current player not explainer!")
 
+        if (newDeck.isEmpty())
+            return nextRound()
+
         return copy(deck = newDeck)
+    }
+
+    fun nextTeam(playerId: String): Game {
+        val currentPlayer = players[playerId]
+        if (currentPlayer == null || teams[currentTeam].explainerId != currentPlayer.id)
+            throw java.lang.IllegalArgumentException("Current player not explainer!")
+
+        return copy(currentTeam = (currentTeam + 1) % teams.size)
     }
 
     fun joinGame(player: Player): Game {
@@ -77,11 +93,22 @@ data class Game(
 
     private fun startGame(): Game {
         val players = players.values
-        val deck = players.fold(emptyList<String>()) { acc, player ->  acc + player.words}.toSet()
         val straightTeams = players.shuffled().chunked(2) { twoPlayers -> Team(twoPlayers[0].id, twoPlayers[1].id) }
         val reversedTeams = straightTeams.map(Team::reverse)
         val teams = straightTeams + reversedTeams
-        return copy(state = GameState.Playing, deck = deck, teams = teams)
+        return copy(state = GameState.Playing, teams = teams).resetDeckAndCurrentTeam()
+    }
+
+    private fun resetDeckAndCurrentTeam(): Game {
+        val players = players.values
+        val deck = players.fold(emptyList<String>()) { acc, player ->  acc + player.words}.toSet()
+        return copy(deck = deck, currentTeam = 0)
+    }
+
+    private fun nextRound(): Game {
+        if (round == Round.DescribeInOneWord)
+            return copy(state = GameState.Finished)
+        return copy(round = Round.values()[round.ordinal + 1]).resetDeckAndCurrentTeam()
     }
 }
 
@@ -93,7 +120,7 @@ fun newGame(settings: GameSettings): Game {
     if (settings.playersCount % 2 != 0)
         throw IllegalArgumentException("There should be even number of players.")
     val id = newId()
-    return Game(id, settings, GameState.GatheringParty, emptyMap(), emptySet(), emptyList(), 0)
+    return Game(id, settings, GameState.GatheringParty, emptyMap(), emptySet(), emptyList(), 0, Round.DescribeInWords)
 }
 
 fun newPlayer(name: String): Player {

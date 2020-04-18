@@ -96,10 +96,15 @@
                 ws.onmessage = msg => this.updateGameState(JSON.parse(msg.data));
                 ws.onclose = () => console.warn("WebSocket connection closed");
                 ws.onopen = () => console.info("WebSocket connected.");
+                this.setTitle();
             },
             updateGameState(gameContext) {
                 this.game = gameContext.game;
                 this.playerId = gameContext.playerId;
+            },
+            setTitle() {
+                if (this.player)
+                    document.title = 'The Hat | ' + this.player.name;
             }
         }
     });

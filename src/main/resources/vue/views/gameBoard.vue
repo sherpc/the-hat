@@ -2,7 +2,7 @@
     <div>
         <div>
             <h3>Game state</h3>
-            game state: {{game.state}}
+            game state: {{game.state}} <i v-if="game.state == 'Playing'">({{game.round}})</i>
             <br/>
             game board, hello {{player.name}}!
         </div>
@@ -20,7 +20,8 @@
             <component v-bind:is="playerState"
                        v-bind:active-pair="activePair"
                        v-bind:initial-deck="game.deck"
-                       v-on:remaining-deck="onRemainingDeck"></component>
+                       v-on:remaining-deck="onRemainingDeck"
+                       v-on:next-team="onNextTeam"></component>
         </div>
     </div>
 </template>
@@ -37,6 +38,11 @@
             },
             onRemainingDeck(remainingDeck) {
                 Vue.http.post(`/api/games/${this.game.id}/${this.playerId}/remainingDeck`, remainingDeck).then(response => {
+                    return true;
+                }, err => console.error(err));
+            },
+            onNextTeam() {
+                Vue.http.post(`/api/games/${this.game.id}/${this.playerId}/nextTeam`).then(response => {
                     return true;
                 }, err => console.error(err));
             }

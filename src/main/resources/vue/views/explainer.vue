@@ -10,7 +10,7 @@
             <div v-else-if="deck.length > 0">
                 <div>Next word: <i>{{randomWord}}</i></div>
                 <div><button v-on:click="onNextWord">Next!</button></div>
-                <div><button v-on:click="onNextPlayer">Change player</button></div>
+                <div><button v-on:click="onNextTeam">Change player</button></div>
             </div>
             <div v-else>Game finished!</div>
         </div>
@@ -43,9 +43,9 @@
                     this.$emit('game-over');
                 }
             },
-            onNextPlayer() {
+            onNextTeam() {
                 this.awaitingPlayerChange = true;
-                this.$emit('next-player');
+                this.$emit('next-team');
             }
         },
         computed: {
