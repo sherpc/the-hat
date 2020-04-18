@@ -1,20 +1,39 @@
 <template id="games">
     <div>
-        <div>
-            <ul class="user-overview-list">
-                <li v-for="game in games">
-                    <a :href="`/games/${game.id}`">{{game.settings.title}} ({{game.settings.wordsCount}} words, {{game.settings.playersCount}} players)</a>
-                </li>
-            </ul>
+        <div class="pure-g">
+            <div class="pure-u-1-2">
+                <form class="pure-form">
+                    <fieldset>
+                        <legend>New game</legend>
+                        <input class="pure-input-1-4" v-model="newGame.title" placeholder="New game name">
+                        <input style="width: 50px" type="number" v-model.number="newGame.wordsCount" placeholder="Words count">
+                        <input style="width: 50px" type="number" v-model.number="newGame.playersCount" placeholder="Players count">
+
+                        <button v-on:click="createGame" type="submit" class="pure-button pure-button-primary">Create new game</button>
+                    </fieldset>
+                </form>
+            </div>
         </div>
         <hr/>
-        <div>
-            <h3>New game</h3>
-            <input v-model="newGame.title" placeholder="New game name">
-            <input type="number" v-model.number="newGame.wordsCount" placeholder="Words count">
-            <input type="number" v-model.number="newGame.playersCount" placeholder="Players count">
-            <button v-on:click="createGame">Create new game</button>
-            <p>debug: {{ newGame }}</p>
+        <div class="pure-g">
+            <div class="pure-u-1">
+                <table class="pure-table pure-table-horizontal">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Words</th>
+                            <th>Players</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="game in games">
+                            <td><a :href="`/games/${game.id}`">{{game.settings.title}}</a></td>
+                            <td>{{game.settings.wordsCount}}</td>
+                            <td>{{game.settings.playersCount}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </template>
@@ -60,16 +79,5 @@
     });
 </script>
 <style>
-    ul.user-overview-list {
-        padding: 0;
-        list-style: none;
-    }
-    ul.user-overview-list a {
-        display: block;
-        padding: 16px;
-        border-bottom: 1px solid #ddd;
-    }
-    ul.user-overview-list a:hover {
-        background: #00000010;
-    }
+
 </style>
