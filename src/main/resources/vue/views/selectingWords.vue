@@ -29,7 +29,7 @@
             wordsReady() {
                 this.loading = true;
                 this.$emit('words-ready', Array.from(this.wordsEditor));
-                Vue.http.post(`/api/games/${this.gameId}/${this.player.id}/setWords`, this.wordsEditor).then(response => {
+                Vue.http.post(`/api/games/${this.gameId}/${this.player.id}/setWords`, Array.from(this.trimmedWords)).then(response => {
                     return response.json();
                 }, err => {
                     console.log(err);
@@ -41,8 +41,15 @@
         },
         computed: {
             allWordsFilledIn() {
-                return this.wordsCount == this.wordsEditor.filter(w => w && w.trim()).length;
+                return this.wordsCount == this.trimmedWords.length;
+            },
+            trimmedWords() {
+                return this.wordsEditor.filter(w => w && w.trim()).filter(onlyUnique);
             }
         }
     });
+
+    function onlyUnique(value, index, self) {
+        return self.indexOf(value) === index;
+    }
 </script>

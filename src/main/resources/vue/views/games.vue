@@ -13,8 +13,7 @@
                             <input id="playersCount" style="width: 50px; display: inline" type="number" v-model.number="newGame.playersCount" placeholder="Players count" required> игроков
                         </label>
 
-
-                        <button v-on:click.prevent="createGame" type="submit" class="pure-button button-success">Создать игру</button>
+                        <button v-on:click.prevent="createGame" :disabled="!newGameSettingsIsValid" type="submit" class="pure-button button-success">Создать игру</button>
                     </fieldset>
                 </form>
             </div>
@@ -35,7 +34,7 @@
                     <tbody>
                         <tr v-for="game in games">
                             <td><a :href="`/games/${game.id}`">{{game.settings.title}}</a></td>
-                            <td>{{game.settings.playersCount}}</td>
+                            <td>{{playersCount(game)}} / {{game.settings.playersCount}}</td>
                             <td>{{gameStateText(game.state)}}</td>
                         </tr>
                     </tbody>
@@ -73,7 +72,7 @@
                 Vue.http.post("/api/games/", this.newGame).then(() => {
                     console.info("New game created");
                     this.fetchGames();
-                    this.newGame = newGameTemplate;
+                    this.newGame = newGameTemplate();
                 });
             },
             fetchGames() {
@@ -88,6 +87,14 @@
                     case 'Playing': return 'Игра началась';
                     case 'Finished': return 'Игра закончена';
                 }
+            },
+            playersCount(game) {
+                return Object.keys(game.players).length;
+            },
+        },
+        computed: {
+            newGameSettingsIsValid() {
+                return this.newGame.title && this.newGame.title.trim() && this.newGame.wordsCount > 0 && this.newGame.playersCount > 0;
             }
         }
     });

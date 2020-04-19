@@ -4,7 +4,7 @@
             <form class="pure-form">
                 <fieldset>
                     <input type="text" v-model="name" placeholder="Твое имя">
-                    <button v-on:click.prevent="joinGame" type="submit" class="pure-button pure-button-primary">Зайти в игру</button>
+                    <button v-on:click.prevent="joinGame" :disabled="!(name.trim())" type="submit" class="pure-button pure-button-primary">Зайти в игру</button>
                 </fieldset>
             </form>
         </div>

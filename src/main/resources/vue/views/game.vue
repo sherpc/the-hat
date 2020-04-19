@@ -60,7 +60,10 @@
         },
         computed: {
             availableToJoin() {
-                return this.game.state == 'GatheringParty';
+                return this.game.state == 'GatheringParty' && this.playersCount < this.game.settings.playersCount;
+            },
+            playersCount() {
+                return Object.keys(this.game.players).length;
             },
             showLoading() {
                 return this.loading ? 'block' : 'none';
@@ -75,7 +78,7 @@
                 return null;
             },
             roundDescription() {
-                const round = this?.game?.round;
+                const round = this.game && this.game.round;
                 if (round) {
                     switch (round) {
                         case 'DescribeInWords': return 'словами';
