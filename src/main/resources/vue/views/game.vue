@@ -82,7 +82,7 @@
                 if (round) {
                     switch (round) {
                         case 'DescribeInWords': return 'словами';
-                        case 'Words': return 'крокодил';
+                        case 'Show': return 'крокодил';
                         case 'DescribeInOneWord': return 'одним словом';
                     }
                 }
@@ -102,7 +102,8 @@
             initWsConnection(gameContext) {
                 console.info('Connecting to WebSocket...');
                 let path = ['games', gameContext.game.id, gameContext.playerId].join('/');
-                let url = `ws://${location.hostname}:${location.port}/${path}`;
+                const wsProtocol = location.protocol !== 'https:' ? 'ws' : 'wss';
+                let url = `${wsProtocol}://${location.hostname}:${location.port}/${path}`;
                 let ws = new WebSocket(url);
                 ws.onmessage = msg => this.updateGameState(JSON.parse(msg.data));
                 ws.onclose = () => console.warn("WebSocket connection closed");

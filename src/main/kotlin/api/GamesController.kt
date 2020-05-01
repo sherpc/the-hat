@@ -3,7 +3,6 @@ package api
 import io.javalin.http.Context
 import io.javalin.http.NotFoundResponse
 import io.javalin.plugin.rendering.vue.VueComponent
-import model.game.Game
 import model.game.GameSettings
 import org.slf4j.LoggerFactory
 

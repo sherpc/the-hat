@@ -1,12 +1,13 @@
-FROM gradle:6.3.0-jdk11
+FROM openjdk:11-jdk-slim
 
 WORKDIR /opt/the-hat/
 
-COPY gradlew /opt/the-hat/gradlew
-RUN ./gradlew tasks
+COPY *.gradle gradle.* gradlew /opt/the-hat/
+COPY gradle /opt/the-hat/gradle
+RUN ./gradlew --version
 
-COPY . /opt/the-hat
+COPY . .
 # run for downloading actual gradle from gradle-wrapper
-RUN ./gradlew clean build
+RUN ./gradlew --no-daemon clean build
 
 CMD java -jar build/libs/the-hat-1.0.jar

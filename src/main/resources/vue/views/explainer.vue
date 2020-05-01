@@ -15,7 +15,7 @@
                 </form>
                 <div></div>
 <!--                <div><button v-on:click="onNextTeam">Change player</button></div>-->
-                <timer v-bind:duration="5" v-on:timer-finished="onNextTeam"></timer>
+                <timer v-bind:duration="30" v-on:timer-finished="onNextTeam"></timer>
             </div>
             <div v-else>Игра окончена!</div>
         </div>

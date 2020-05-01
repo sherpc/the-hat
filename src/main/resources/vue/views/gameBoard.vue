@@ -8,7 +8,7 @@
 <!--        </div>-->
         <div v-if="game.state == 'GatheringParty'">
             <div class="pure-g">
-                <div class="pure-u-1">Ждем, пока все соберутся и введут слова. <br/> Готовы играть {{playersCount}} из {{game.settings.playersCount}} игроков.</div>
+                <div class="pure-u-1">Ждем, пока все соберутся и введут слова. <br/> Собралось {{playersCount}} из {{game.settings.playersCount}} игроков.</div>
             </div>
         </div>
         <div v-if="game.state == 'Playing'">
