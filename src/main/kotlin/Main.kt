@@ -36,6 +36,9 @@ fun main(args: Array<String>) {
         path("games") {
             path(":game-id") {
                 get(VueComponent("game"))
+                path("admin") {
+                    get(GamesController::gameAdmin)
+                }
                 path(":player-id") {
                     get(GamesController::gameAndPlayer)
                 }

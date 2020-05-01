@@ -25,6 +25,10 @@ object GamesController {
         VueComponent("game").handle(ctx)
     }
 
+    fun gameAdmin(ctx: Context) {
+        VueComponent("game-admin").handle(ctx)
+    }
+
     fun createGame(ctx: Context) {
         val settings = ctx.body<GameSettings>()
         val statusCode = try {

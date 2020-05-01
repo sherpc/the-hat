@@ -1,11 +1,5 @@
 <template id="gameBoard">
     <div>
-<!--        <div>-->
-<!--            <h3>Game state</h3>-->
-<!--            game state: {{game.state}} <i v-if="game.state == 'Playing'">({{game.round}})</i>-->
-<!--            <br/>-->
-<!--            game board, hello {{player.name}}!-->
-<!--        </div>-->
         <div v-if="game.state == 'GatheringParty'">
             <div class="pure-g">
                 <div class="pure-u-1">Ждем, пока все соберутся и введут слова. <br/> Собралось {{playersCount}} из {{game.settings.playersCount}} игроков.</div>
@@ -23,9 +17,9 @@
                 <div v-if="!playerIsActive" class="pure-u-1 pure-u-lg-1-2">
                     <h4 class="is-center">Очередность команд</h4>
                     <ul>
-                        <li v-for="pair in teamsQueue">
-                            <i v-if="pair.active" class="fa fa-play"></i>
-                            {{pair.explainer.name}} → {{pair.listener.name}}
+                        <li v-for="team in teamsQueue">
+                            <i v-if="team.active" class="fa fa-play"></i>
+                            ({{team.score}}) {{team.explainer.name}} → {{team.listener.name}}
                         </li>
                     </ul>
                 </div>
@@ -61,11 +55,13 @@
             },
             teamsQueue() {
                 return this.game.teams.map((team, i) => {
-                    return {
+                    let t = {
                         explainer: this.playerById(team.explainerId),
                         listener: this.playerById(team.listenerId),
-                        active: i == this.game.currentTeam
-                    }
+                        active: i == this.game.currentTeam,
+                    };
+                    t.score = t.explainer.score + t.listener.score;
+                    return t;
                 });
             },
             activePair() {

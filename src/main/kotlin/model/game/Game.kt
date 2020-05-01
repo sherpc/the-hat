@@ -1,7 +1,6 @@
 package model.game
 
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 data class GameSettings(val title: String, val wordsCount: Int, val playersCount: Int)
 
@@ -17,7 +16,17 @@ enum class Round {
     DescribeInWords, Show, DescribeInOneWord
 }
 
-data class Player(val id: String, val name: String, val words: Set<String>, val state: PlayerState)
+data class Player(
+    val id: String,
+    val name: String,
+    val words: Set<String>,
+    val state: PlayerState,
+    val score: Int) {
+
+    fun guess(): Player {
+        return copy(score = score + 1)
+    }
+}
 
 data class Team(val explainerId: String, val listenerId: String) {
     fun reverse(): Team {
@@ -48,10 +57,12 @@ data class Game(
         if (currentPlayer == null || teams[currentTeam].explainerId != currentPlayer.id)
             throw java.lang.IllegalArgumentException("Current player not explainer!")
 
-        if (newDeck.isEmpty())
-            return nextRound()
+        val gameWithUpdatedStats = updatePlayer(playerId) { it.guess() }
 
-        return copy(deck = newDeck)
+        if (newDeck.isEmpty())
+            return gameWithUpdatedStats.nextRound()
+
+        return gameWithUpdatedStats.copy(deck = newDeck)
     }
 
     fun nextTeam(playerId: String): Game {
@@ -96,19 +107,19 @@ data class Game(
         val straightTeams = players.shuffled().chunked(2) { twoPlayers -> Team(twoPlayers[0].id, twoPlayers[1].id) }
         val reversedTeams = straightTeams.map(Team::reverse)
         val teams = straightTeams + reversedTeams
-        return copy(state = GameState.Playing, teams = teams).resetDeckAndCurrentTeam()
+        return copy(state = GameState.Playing, teams = teams, currentTeam = 0).resetDeck()
     }
 
-    private fun resetDeckAndCurrentTeam(): Game {
+    private fun resetDeck(): Game {
         val players = players.values
         val deck = players.fold(emptyList<String>()) { acc, player ->  acc + player.words}.toSet()
-        return copy(deck = deck, currentTeam = 0)
+        return copy(deck = deck)
     }
 
     private fun nextRound(): Game {
         if (round == Round.DescribeInOneWord)
             return copy(state = GameState.Finished)
-        return copy(round = Round.values()[round.ordinal + 1]).resetDeckAndCurrentTeam()
+        return copy(round = Round.values()[round.ordinal + 1]).resetDeck()
     }
 }
 
@@ -131,5 +142,5 @@ fun newGame(settings: GameSettings): Game {
 }
 
 fun newPlayer(name: String): Player {
-    return Player(newId(), name, emptySet(), PlayerState.SelectingWords)
+    return Player(newId(), name, emptySet(), PlayerState.SelectingWords, 0)
 }
