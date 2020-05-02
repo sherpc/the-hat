@@ -28,21 +28,38 @@ data class Player(
     }
 }
 
-data class Team(val explainerId: String, val listenerId: String) {
-    fun reverse(): Team {
+data class Team(val firstPlayerId: String, val secondPlayerId: String) {
+    fun toPair(): ExplainPair {
+        return ExplainPair(firstPlayerId, secondPlayerId)
+    }
+}
+
+data class ExplainPair(val explainerId: String, val listenerId: String) {
+    fun reverse(): ExplainPair {
         return copy(explainerId = listenerId, listenerId = explainerId)
     }
 }
 
-data class Game(
+typealias ScoresByPlayerId = MutableMap<String, Int>
+typealias ScoresByRound = Map<Round, ScoresByPlayerId>
+
+data class Game private constructor(
     val id: String,
     val settings: GameSettings,
-    val state: GameState,
-    val players: Map<String, Player>,
-    val deck: Set<String>,
-    val teams: List<Team>,
-    val currentTeam: Int,
-    val round: Round) {
+    val state: GameState = GameState.GatheringParty,
+    val players: Map<String, Player> = emptyMap(),
+    val deck: Set<String> = emptySet(),
+    val teams: List<Team> = emptyList(),
+    val pairs: List<ExplainPair> = emptyList(),
+    val currentTeam: Int = 0,
+    val round: Round = Round.DescribeInWords,
+    val scores: ScoresByRound = Round.values().map { Pair(it, mutableMapOf<String, Int>()) }.toMap()) {
+
+    companion object {
+        fun build(id: String, settings: GameSettings): Game {
+            return Game(id, settings)
+        }
+    }
 
     fun setPlayerWords(playerId: String, newWords: Set<String>): Game {
         if (settings.wordsCount != newWords.size)
@@ -54,10 +71,11 @@ data class Game(
 
     fun setDeck(playerId: String, newDeck: Set<String>): Game {
         val currentPlayer = players[playerId]
-        if (currentPlayer == null || teams[currentTeam].explainerId != currentPlayer.id)
+
+        if (currentPlayer == null || pairs[currentTeam].explainerId != currentPlayer.id)
             throw java.lang.IllegalArgumentException("Current player not explainer!")
 
-        val gameWithUpdatedStats = updatePlayer(playerId) { it.guess() }
+        val gameWithUpdatedStats = updatePlayer(playerId) { it.guess() }.incrementScores(playerId)
 
         if (newDeck.isEmpty())
             return gameWithUpdatedStats.nextRound()
@@ -67,10 +85,10 @@ data class Game(
 
     fun nextTeam(playerId: String): Game {
         val currentPlayer = players[playerId]
-        if (currentPlayer == null || teams[currentTeam].explainerId != currentPlayer.id)
+        if (currentPlayer == null || pairs[currentTeam].explainerId != currentPlayer.id)
             throw java.lang.IllegalArgumentException("Current player not explainer!")
 
-        return copy(currentTeam = (currentTeam + 1) % teams.size)
+        return copy(currentTeam = (currentTeam + 1) % pairs.size)
     }
 
     fun joinGame(player: Player): Game {
@@ -81,6 +99,11 @@ data class Game(
             throw IllegalArgumentException("Game already full of players.")
         val players = players + Pair(player.id, player)
         return copy(players = players)
+    }
+
+    private fun incrementScores(explainerPlayerId: String): Game {
+        scores[round]!![explainerPlayerId] = (scores[round]?.get(explainerPlayerId) ?: 0) + 1
+        return this
     }
 
     private fun startIfReady(): Game {
@@ -104,10 +127,11 @@ data class Game(
 
     private fun startGame(): Game {
         val players = players.values
-        val straightTeams = players.shuffled().chunked(2) { twoPlayers -> Team(twoPlayers[0].id, twoPlayers[1].id) }
-        val reversedTeams = straightTeams.map(Team::reverse)
-        val teams = straightTeams + reversedTeams
-        return copy(state = GameState.Playing, teams = teams, currentTeam = 0).resetDeck()
+        val teams = players.shuffled().chunked(2) { twoPlayers -> Team(twoPlayers[0].id, twoPlayers[1].id) }
+        val pairsFromTeams = teams.map(Team::toPair)
+        val reversedPairs = pairsFromTeams.map(ExplainPair::reverse)
+        val pairs = pairsFromTeams + reversedPairs
+        return copy(state = GameState.Playing, pairs = pairs, teams = teams, currentTeam = 0).resetDeck()
     }
 
     private fun resetDeck(): Game {
@@ -138,7 +162,7 @@ fun newGame(settings: GameSettings): Game {
     if (settings.playersCount % 2 != 0)
         throw IllegalArgumentException("There should be even number of players.")
     val id = newId()
-    return Game(id, settings, GameState.GatheringParty, emptyMap(), emptySet(), emptyList(), 0, Round.DescribeInWords)
+    return Game.build(id, settings)
 }
 
 fun newPlayer(name: String): Player {

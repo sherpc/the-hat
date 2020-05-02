@@ -1,7 +1,7 @@
 <template id="gameAdmin">
     <div class="pure-g">
         <div class="pure-u-1">
-            <div v-show="showLoading">...LOADING...</div>
+            <div v-show="loading">...LOADING...</div>
             <div v-if="game">
                 <h4 class="is-center">{{game.settings.title}}</h4>
 

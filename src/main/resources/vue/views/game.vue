@@ -78,15 +78,7 @@
                 return null;
             },
             roundDescription() {
-                const round = this.game && this.game.round;
-                if (round) {
-                    switch (round) {
-                        case 'DescribeInWords': return 'словами';
-                        case 'Show': return 'крокодил';
-                        case 'DescribeInOneWord': return 'одним словом';
-                    }
-                }
-                return null;
+                return this.game && this.game.round && t['round'][this.game.round];
             }
         },
         methods: {

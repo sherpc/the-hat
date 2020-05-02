@@ -9,6 +9,15 @@
     <link rel="manifest" href="/site.webmanifest">
     <script src="/webjars/vue/2.6.10/dist/vue.js"></script>
     <script src="/webjars/vue-resource/dist/vue-resource.min.js"></script>
+    <script>
+        window.t = {
+            'round': {
+                'DescribeInWords': 'словами',
+                'Show': 'крокодил',
+                'DescribeInOneWord': 'одним словом'
+            }
+        }
+    </script>
     <style>
         .content-wrapper-external {
             margin: 10px auto;
@@ -73,6 +82,10 @@
             left: 50%;
             top: 0;
             transform: translate(-50%, -0%);
+        }
+
+        tr.leader {
+            background-color: lightyellow;
         }
     </style>
     @componentRegistration

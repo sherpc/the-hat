@@ -7,6 +7,33 @@
         </div>
         <div v-if="game.state == 'Playing'">
             <div class="pure-g">
+                <div class="pure-u-1">
+                    <h4 class="is-center">Статистика</h4>
+                    <table class="pure-table pure-table-bordered">
+                        <thead>
+                        <tr>
+                            <th><i class="fa fa-users"></i> Команда</th>
+                            <th class="round" v-for="round in rounds">
+                                {{roundTranslation(round)}}
+                            </th>
+                            <th>Всего</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr v-bind:class="{ leader: team.isLeader }" v-for="team in teamsWithStats">
+                            <td>
+                                <span v-if="team.isLeader">🎉</span> {{team.name}}
+                            </td>
+                            <td class="is-center" v-for="round in rounds">
+                                {{team.scores[round]}}
+                            </td>
+                            <td class="is-center"><span>{{team.totalScore}}</span></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="pure-g">
                 <div class="pure-u-1" v-bind:class="playerIsActive ? '' : 'pure-u-lg-1-2'">
                     <component v-bind:is="playerState"
                                v-bind:active-pair="activePair"
@@ -20,7 +47,7 @@
                     <ul>
                         <li v-for="team in teamsQueue">
                             <i v-if="team.active" class="fa fa-play"></i>
-                            ({{team.score}}) {{team.explainer.name}} → {{team.listener.name}}
+                            {{team.explainer.name}} → {{team.listener.name}}
                         </li>
                     </ul>
                 </div>
@@ -48,6 +75,9 @@
                 Vue.http.post(`/api/games/${this.game.id}/${this.playerId}/nextTeam`).then(response => {
                     return true;
                 }, err => console.error(err));
+            },
+            roundTranslation(round) {
+                return t['round'][round];
             }
         },
         computed: {
@@ -55,7 +85,7 @@
                 return Object.keys(this.game.players).length;
             },
             teamsQueue() {
-                return this.game.teams.map((team, i) => {
+                return this.game.pairs.map((team, i) => {
                     let t = {
                         explainer: this.playerById(team.explainerId),
                         listener: this.playerById(team.listenerId),
@@ -81,6 +111,32 @@
             },
             playerIsActive() {
                 return this.playerState != 'observer';
+            },
+            rounds() {
+                return this.game ? Object.keys(this.game.scores) : [];
+            },
+            teamsWithStats() {
+                const game = this.game;
+                const rounds = this.rounds;
+                let result = game.teams.map(t => {
+                    let scores = rounds.map(round => {
+                        let roundScore = game.scores[round];
+                        let roundTeamScore = (roundScore[t.firstPlayerId] || 0) + (round[t.secondPlayerId] || 0)
+                        return [round, roundTeamScore];
+                    });
+                    return {
+                        name: this.playerById(t.firstPlayerId).name + ' + ' + this.playerById(t.secondPlayerId).name,
+                        scores: Object.fromEntries(scores),
+                        totalScore: scores.map(s => s[1]).reduce((acc, x) => acc + x)
+                    };
+                });
+
+                const maxScore = result.map(t => t.totalScore).reduce((acc, x) => x > acc ? x : acc)
+
+                return result.map(t => {
+                    t.isLeader = t.totalScore == maxScore;
+                    return t;
+                });
             }
         }
     });
