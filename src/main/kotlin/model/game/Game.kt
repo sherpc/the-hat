@@ -2,7 +2,7 @@ package model.game
 
 import java.util.*
 
-data class GameSettings(val title: String, val wordsCount: Int, val playersCount: Int)
+data class GameSettings(val title: String, val wordsCount: Int, val playersCount: Int, val explainTimeoutSeconds: Int)
 
 enum class PlayerState {
     SelectingWords, ReadyToPlay

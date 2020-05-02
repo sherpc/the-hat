@@ -12,6 +12,9 @@
                         <label for="playersCount">
                             <input id="playersCount" style="width: 50px; display: inline" type="number" v-model.number="newGame.playersCount" placeholder="Players count" required> игроков
                         </label>
+                        <label for="explainTimeoutSeconds">
+                            <input id="explainTimeoutSeconds" style="width: 60px; display: inline" type="number" v-model.number="newGame.explainTimeoutSeconds" required> сек на объяснение
+                        </label>
 
                         <button v-on:click.prevent="createGame" :disabled="!newGameSettingsIsValid" type="submit" class="pure-button button-success">Создать игру</button>
                     </fieldset>
@@ -29,6 +32,7 @@
                             <th>Название</th>
                             <th><i class="fa fa-users"></i></th>
                             <th>Статус</th>
+                            <th><i class="fa fa-clock-o"></i></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -36,6 +40,7 @@
                             <td><a :href="`/games/${game.id}`">{{game.settings.title}}</a></td>
                             <td>{{playersCount(game)}} / {{game.settings.playersCount}}</td>
                             <td>{{gameStateText(game.state)}}</td>
+                            <td>{{game.settings.explainTimeoutSeconds}} сек</td>
                         </tr>
                     </tbody>
                 </table>
@@ -48,7 +53,8 @@
         return {
             title: "",
             wordsCount: 5,
-            playersCount: 6
+            playersCount: 6,
+            explainTimeoutSeconds: 90
         };
     };
 

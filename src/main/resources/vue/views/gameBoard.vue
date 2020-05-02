@@ -11,6 +11,7 @@
                     <component v-bind:is="playerState"
                                v-bind:active-pair="activePair"
                                v-bind:initial-deck="game.deck"
+                               v-bind:explain-timeout-seconds="game.settings.explainTimeoutSeconds"
                                v-on:remaining-deck="onRemainingDeck"
                                v-on:next-team="onNextTeam"></component>
                 </div>

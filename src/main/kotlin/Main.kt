@@ -12,7 +12,7 @@ import model.game.GameSettings
 
 fun main(args: Array<String>) {
     // add test game for debug
-    val g = GamesInMemoryStore.newGame(GameSettings("Тестовая", 2, 4))
+    val g = GamesInMemoryStore.newGame(GameSettings("Тестовая", 2, 4, 5))
     val vasyaId = GamesInMemoryStore.joinGame(g.id, "vasya").playerId
     GamesInMemoryStore.setWords(g.id, vasyaId, setOf("hello", "world"))
     val mashaId = GamesInMemoryStore.joinGame(g.id, "masha").playerId

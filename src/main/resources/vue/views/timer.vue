@@ -25,7 +25,6 @@
             duration: {
                 type: Number,
                 required: true,
-                default: 30,
                 validator: function(value) {
                     return value > 0;
                 }
