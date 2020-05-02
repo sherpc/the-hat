@@ -14,7 +14,7 @@
                     <button type="submit" class="pure-button button-success center-by-horizontal" v-on:click.prevent="onNextWord">Next!</button>
                 </form>
 <!--                <div><button v-on:click="onNextTeam">Change player</button></div>-->
-                <timer v-bind:duration="90" v-on:timer-finished="onNextTeam"></timer>
+                <timer v-bind:duration="5" v-on:timer-finished="onNextTeam"></timer>
             </div>
             <div v-else>Игра окончена!</div>
         </div>
@@ -26,6 +26,7 @@
         data: () => ({
             awaitingPlayer: true,
             deck: [],
+            sound: null,
             awaitingPlayerChange: false
         }),
         created() {
@@ -53,7 +54,7 @@
             },
             onTimerFinished() {
                 console.log('boom');
-            }
+            },
         },
         computed: {
             randomWord() {

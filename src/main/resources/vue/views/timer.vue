@@ -35,14 +35,24 @@
             start() {
                 this.timeoutId = setInterval(() => {
                     this.secondsRemaining -= 1;
-                    if (this.secondsRemaining === 0) {
+                    if (this.secondsRemaining === 1) {
                         clearInterval(this.timeoutId);
-                        this.$emit('timer-finished')
+                        const sound = this.sound;
+                        const component = this;
+                        sound.play()
+                            .then(_ => {
+                                sound.addEventListener('ended', __ => component.finish());
+                            })
+                            .catch(_ => component.finish());
                     }
                 }, 1000);
             },
             pause() {
                 this.clearTimeoutId();
+            },
+            finish() {
+                this.secondsRemaining -= 1;
+                this.$emit('timer-finished')
             },
             clearTimeoutId() {
                 if (this.timeoutId) {
@@ -58,6 +68,7 @@
         },
         created() {
             this.secondsRemaining = this.duration;
+            this.sound = new Audio("/time.wav"); // buffers automatically when created
             this.start();
         },
         beforeDestroy() {
