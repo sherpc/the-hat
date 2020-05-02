@@ -10,7 +10,7 @@ import kotlin.test.assertNotNull
 class GamesInMemoryStoreTest {
     @Test fun joinGameConcurrentTest() {
         val playersCount = 1000
-        val game = GamesInMemoryStore.newGame(GameSettings("fake", 1, playersCount))
+        val game = GamesInMemoryStore.newGame(GameSettings("fake", 1, playersCount, 5))
         assertEquals(1, GamesInMemoryStore.allGames().size)
         assertNotNull(game)
         runBlocking {

@@ -6,7 +6,7 @@
             </div>
         </div>
         <div v-if="game.state == 'Playing'">
-            <div class="pure-g">
+            <div v-if="!playerIsActive" class="pure-g">
                 <div class="pure-u-1">
                     <h4 class="is-center">Статистика</h4>
                     <table class="pure-table pure-table-bordered">
