@@ -6,10 +6,10 @@
                 <div v-if="game">
                     <h4 class="is-center">
                         <button v-if="online != null" disabled style="opacity: 1" class="button-xsmall pure-button"
-                                v-bind:class="{ 'button-success': online, 'button-error': !online }">
+                                v-bind:class="[online ? 'button-success' : 'button-error']">
                             <i class="fa fa-plug" aria-hidden="true"></i>
                         </button>
-                        {{game.settings.title}} (раунд: {{roundDescription}})
+                        {{game.settings.title}} j(раунд: {{roundDescription}})
                     </h4>
 
                     <div v-if="player">
