@@ -5,7 +5,7 @@
             <div v-bind:style="{ display: showGameBoard }">
                 <div v-if="game">
                     <h4 class="is-center">
-                        <button disabled style="opacity: 1" class="button-xsmall pure-button"
+                        <button v-if="online != null" disabled style="opacity: 1" class="button-xsmall pure-button"
                                 v-bind:class="{ 'button-success': online, 'button-error': !online }">
                             <i class="fa fa-plug" aria-hidden="true"></i>
                         </button>
@@ -43,7 +43,7 @@
             game: null,
             playerId: null,
             loading: false,
-            online: false
+            online: null
         }),
         created() {
             const gameId = this.$javalin.pathParams["game-id"];
