@@ -15,7 +15,7 @@
                 </div>
             </div>
             <div class="pure-g">
-                <div class="pure-u-1">
+                <div class="pure-u-1" style="overflow-x: scroll">
                     <table class="pure-table pure-table-bordered">
                         <thead>
                         <tr>

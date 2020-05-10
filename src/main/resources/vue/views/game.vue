@@ -9,7 +9,7 @@
                                 v-bind:class="[online ? 'button-success' : 'button-error']">
                             <i class="fa fa-plug" aria-hidden="true"></i>
                         </button>
-                        {{game.settings.title}} j(раунд: {{roundDescription}})
+                        {{game.settings.title}} (раунд: {{roundDescription}})
                     </h4>
 
                     <div v-if="player">

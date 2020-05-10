@@ -1,11 +1,15 @@
 <template id="deckProgress">
     <div class="pure-g">
-        <div class="pure-u-1" style="height: 50px;">
+        <div class="pure-u-lg-1-12 pure-u-1-4 progress-bar-wrapper">
+            <div class="progress-bar">{{explainedWords}} / {{deckSize}} 🎩</div>
+        </div>
+        <div class="pure-u-lg-11-12 pure-u-3-4 progress-bar-wrapper">
             <div class="progress-bar">
-              <span class="bar">
-                <span class="progress" v-bind:style="{width: percent + '%'}">{{explainedWords}} / {{deckSize}} 🎩</span>
-              </span>
+                <span class="bar">
+                    <span class="progress" v-bind:style="{width: percent + '%'}"></span>
+                </span>
             </div>
+
         </div>
     </div>
 </template>
@@ -30,14 +34,15 @@
     });
 </script>
 <style>
-    body {
-        /*background: #eef1f3;*/
+    .progress-bar-wrapper {
+        height: 50px;
     }
 
     .progress-bar {
         border-radius: 60px;
         overflow: hidden;
         width: 100%;
+        display: inline-block;
     }
 
     .progress-bar span {
@@ -52,12 +57,13 @@
         background: #75b800;
         color: #fff;
         padding: 0 5px;
+        height: 26px;
         text-align: right;
     }
 
     .progress-bar {
         left: 50%;
-        max-width: 50%;
+        max-width: 95%;
         position: relative;
         top: 50%;
         transform: translate3d(-50%,-50%,0);
