@@ -39,7 +39,7 @@
                                v-bind:active-pair="activePair"
                                v-bind:initial-deck="game.deck"
                                v-bind:explain-timeout-seconds="game.settings.explainTimeoutSeconds"
-                               v-on:remaining-deck="onRemainingDeck"
+                               v-on:word-explained="onWordExplained"
                                v-on:next-team="onNextTeam"></component>
                 </div>
                 <div v-if="!playerIsActive" class="pure-u-1 pure-u-lg-1-2">
@@ -68,6 +68,11 @@
             },
             onRemainingDeck(remainingDeck) {
                 Vue.http.post(`/api/games/${this.game.id}/${this.playerId}/remainingDeck`, remainingDeck).then(response => {
+                    return true;
+                }, err => console.error(err));
+            },
+            onWordExplained(word) {
+                Vue.http.post(`/api/games/${this.game.id}/${this.playerId}/wordExplained`, word).then(response => {
                     return true;
                 }, err => console.error(err));
             },
@@ -121,7 +126,7 @@
                 let result = game.teams.map(t => {
                     let scores = rounds.map(round => {
                         let roundScore = game.scores[round];
-                        let roundTeamScore = (roundScore[t.firstPlayerId] || 0) + (round[t.secondPlayerId] || 0)
+                        let roundTeamScore = (roundScore[t.firstPlayerId] || 0) + (roundScore[t.secondPlayerId] || 0)
                         return [round, roundTeamScore];
                     });
                     return {

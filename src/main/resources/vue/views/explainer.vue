@@ -42,9 +42,10 @@
                 this.awaitingPlayer = false;
             },
             onNextWord() {
-                this.deck.shift();
-                const remainingDeck = Array.from(this.deck);
-                this.$emit('remaining-deck', remainingDeck);
+                const word = this.deck.shift();
+                //const remainingDeck = Array.from(this.deck);
+                //this.$emit('remaining-deck', remainingDeck);
+                this.$emit('word-explained', word)
                 if (this.deck.length === 0) {
                     this.$emit('game-over');
                 }

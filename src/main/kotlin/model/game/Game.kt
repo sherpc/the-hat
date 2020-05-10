@@ -69,6 +69,22 @@ data class Game private constructor(
         }.startIfReady()
     }
 
+    fun wordExplained(explainerPlayerId: String, word: String): Game {
+        val currentPlayer = players[explainerPlayerId]
+
+        if (currentPlayer == null || pairs[currentTeam].explainerId != currentPlayer.id)
+            throw java.lang.IllegalArgumentException("Current player not explainer!")
+
+        val gameWithUpdatedStats = updatePlayer(explainerPlayerId) { it.guess() }.incrementScores(explainerPlayerId)
+
+        val newDeck = deck.minusElement(word)
+
+        if (newDeck.isEmpty())
+            return gameWithUpdatedStats.nextRound()
+
+        return gameWithUpdatedStats.copy(deck = newDeck)
+    }
+
     fun setDeck(playerId: String, newDeck: Set<String>): Game {
         val currentPlayer = players[playerId]
 

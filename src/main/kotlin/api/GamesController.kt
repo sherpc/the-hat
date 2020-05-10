@@ -65,6 +65,14 @@ object GamesController {
         }
     }
 
+    fun wordExplained(ctx: Context) {
+        val gameContext = gameContextFromPath(ctx)
+        val word = ctx.body()
+        updateGameAndBroadcast(ctx) {
+            GamesInMemoryStore.wordExplained(gameContext.game.id, gameContext.playerId, word)
+        }
+    }
+
     fun nextTeam(ctx: Context) {
         val gameContext = gameContextFromPath(ctx)
         updateGameAndBroadcast(ctx) {

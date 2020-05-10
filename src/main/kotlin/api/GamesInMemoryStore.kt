@@ -41,6 +41,11 @@ object GamesInMemoryStore {
         return GameContext(updatedGame, playerId)
     }
 
+    fun wordExplained(gameId: String, explainerPlayerId: String, word: String): GameContext {
+        val updatedGame = updateGameWithLock(gameId) { it.wordExplained(explainerPlayerId, word) }
+        return GameContext(updatedGame, explainerPlayerId)
+    }
+
     fun nextTeam(gameId: String, playerId: String): GameContext {
         val updatedGame = updateGameWithLock(gameId) { it.nextTeam(playerId) }
         return GameContext(updatedGame, playerId)

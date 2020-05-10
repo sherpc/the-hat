@@ -57,8 +57,11 @@ fun main(args: Array<String>) {
                         path("setWords") {
                             post(GamesController::setWords)
                         }
-                        path("remainingDeck") {
-                            post(GamesController::remainingDeck)
+//                        path("remainingDeck") {
+//                            post(GamesController::remainingDeck)
+//                        }
+                        path("wordExplained") {
+                            post(GamesController::wordExplained)
                         }
                         path("nextTeam") {
                             post(GamesController::nextTeam)
