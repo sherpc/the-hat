@@ -4,7 +4,13 @@
             <div v-bind:style="{ display: showLoading }">...LOADING...</div>
             <div v-bind:style="{ display: showGameBoard }">
                 <div v-if="game">
-                    <h4 class="is-center">{{game.settings.title}} (раунд: {{roundDescription}})</h4>
+                    <h4 class="is-center">
+                        <button disabled style="opacity: 1" class="button-xsmall pure-button"
+                                v-bind:class="{ 'button-success': online, 'button-error': !online }">
+                            <i class="fa fa-plug" aria-hidden="true"></i>
+                        </button>
+                        {{game.settings.title}} (раунд: {{roundDescription}})
+                    </h4>
 
                     <div v-if="player">
                         <selecting-words
@@ -36,7 +42,8 @@
         data: () => ({
             game: null,
             playerId: null,
-            loading: false
+            loading: false,
+            online: false
         }),
         created() {
             const gameId = this.$javalin.pathParams["game-id"];
@@ -98,8 +105,14 @@
                 let url = `${wsProtocol}://${location.hostname}:${location.port}/${path}`;
                 let ws = new WebSocket(url);
                 ws.onmessage = msg => this.updateGameState(JSON.parse(msg.data));
-                ws.onclose = () => console.warn("WebSocket connection closed");
-                ws.onopen = () => console.info("WebSocket connected.");
+                ws.onclose = () => {
+                    this.online = false;
+                    console.warn("WebSocket connection closed");
+                };
+                ws.onopen = () => {
+                    this.online = true;
+                    console.info("WebSocket connected.");
+                };
                 this.setTitle();
             },
             updateGameState(gameContext) {

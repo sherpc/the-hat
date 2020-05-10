@@ -43,6 +43,19 @@ data class ExplainPair(val explainerId: String, val listenerId: String) {
 typealias ScoresByPlayerId = MutableMap<String, Int>
 typealias ScoresByRound = Map<Round, ScoresByPlayerId>
 
+data class LastExplainerScore(
+    val previousScore: Int = 0,
+    val currentScore: Int = 0) {
+
+    fun incScore(): LastExplainerScore {
+        return copy(currentScore = currentScore + 1)
+    }
+
+    fun nextTeam(): LastExplainerScore {
+        return copy(currentScore = 0, previousScore = currentScore)
+    }
+}
+
 data class Game private constructor(
     val id: String,
     val settings: GameSettings,
@@ -54,7 +67,8 @@ data class Game private constructor(
     val pairs: List<ExplainPair> = emptyList(),
     val currentTeam: Int = 0,
     val round: Round = Round.DescribeInWords,
-    val scores: ScoresByRound = Round.values().map { Pair(it, mutableMapOf<String, Int>()) }.toMap()) {
+    val scores: ScoresByRound = Round.values().map { Pair(it, mutableMapOf<String, Int>()) }.toMap(),
+    val lastExplainerScore: LastExplainerScore = LastExplainerScore()) {
 
     companion object {
         fun build(id: String, settings: GameSettings): Game {
@@ -108,7 +122,7 @@ data class Game private constructor(
         return nextTeamInternal()
     }
 
-    private fun nextTeamInternal(): Game = copy(currentTeam = (currentTeam + 1) % pairs.size)
+    private fun nextTeamInternal(): Game = copy(currentTeam = (currentTeam + 1) % pairs.size, lastExplainerScore = lastExplainerScore.nextTeam())
 
     fun joinGame(player: Player): Game {
         // Thread.sleep(TimeUnit.MILLISECONDS.toMillis(500))
@@ -122,7 +136,7 @@ data class Game private constructor(
 
     private fun incrementScores(explainerPlayerId: String): Game {
         scores[round]!![explainerPlayerId] = (scores[round]?.get(explainerPlayerId) ?: 0) + 1
-        return this
+        return this.copy(lastExplainerScore = lastExplainerScore.incScore())
     }
 
     private fun startIfReady(): Game {

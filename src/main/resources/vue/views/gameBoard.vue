@@ -5,10 +5,17 @@
                 <div class="pure-u-1">Ждем, пока все соберутся и введут слова. <br/> Собралось {{playersCount}} из {{game.settings.playersCount}} игроков.</div>
             </div>
         </div>
-        <div v-if="game.state == 'Playing'">
-            <div v-if="!playerIsActive" class="pure-g">
+        <div v-if="game.state == 'Finished'">
+            <h3 class="is-center">Игра окончена!</h3>
+        </div>
+        <div v-if="game.state != 'GatheringParty' && !playerIsActive">
+            <div class="pure-g">
                 <div class="pure-u-1">
-                    <h4 class="is-center">Статистика ({{explainedWordsInRound}} из {{initialDeckSize}} отгадано)</h4>
+                    <h4 class="is-center">Статистика (за последний ход объяснено <strong>{{lastExplainerScore}}</strong>)</h4>
+                </div>
+            </div>
+            <div class="pure-g">
+                <div class="pure-u-1">
                     <table class="pure-table pure-table-bordered">
                         <thead>
                         <tr>
@@ -33,6 +40,8 @@
                     </table>
                 </div>
             </div>
+        </div>
+        <div v-if="game.state == 'Playing'">
             <div class="pure-g">
                 <div class="pure-u-1" v-bind:class="playerIsActive ? '' : 'pure-u-lg-1-2'">
                     <component v-bind:is="playerState"
@@ -52,6 +61,11 @@
                     </ul>
                 </div>
             </div>
+            <deck-progress
+                    v-if="!playerIsActive"
+                    v-bind:deck-size="initialDeckSize"
+                    v-bind:explained-words="explainedWordsInRound">
+            </deck-progress>
         </div>
     </div>
 </template>
@@ -115,7 +129,7 @@
                     return 'observer';
             },
             playerIsActive() {
-                return this.playerState != 'observer';
+                return this.playerState != 'observer' && this.game.state == 'Playing';
             },
             rounds() {
                 return this.game ? Object.keys(this.game.scores) : [];
@@ -151,7 +165,10 @@
                 return Object.values(roundScore).reduce((acc, x) => acc + x, 0);
             },
             initialDeckSize() {
-                return this.game.initialDeckSize;
+                return this.game?.initialDeckSize || 0;
+            },
+            lastExplainerScore() {
+                return this.game?.lastExplainerScore.previousScore || 0;
             }
         }
     });
