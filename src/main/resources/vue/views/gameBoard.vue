@@ -8,7 +8,7 @@
         <div v-if="game.state == 'Playing'">
             <div v-if="!playerIsActive" class="pure-g">
                 <div class="pure-u-1">
-                    <h4 class="is-center">Статистика</h4>
+                    <h4 class="is-center">Статистика ({{explainedWordsInRound}} из {{initialDeckSize}} отгадано)</h4>
                     <table class="pure-table pure-table-bordered">
                         <thead>
                         <tr>
@@ -126,22 +126,32 @@
                 let result = game.teams.map(t => {
                     let scores = rounds.map(round => {
                         let roundScore = game.scores[round];
-                        let roundTeamScore = (roundScore[t.firstPlayerId] || 0) + (roundScore[t.secondPlayerId] || 0)
+                        let roundTeamScore = (roundScore[t.firstPlayerId] || 0) + (roundScore[t.secondPlayerId] || 0);
                         return [round, roundTeamScore];
                     });
                     return {
                         name: this.playerById(t.firstPlayerId).name + ' + ' + this.playerById(t.secondPlayerId).name,
                         scores: Object.fromEntries(scores),
-                        totalScore: scores.map(s => s[1]).reduce((acc, x) => acc + x)
+                        totalScore: scores.map(s => s[1]).reduce((acc, x) => acc + x, 0)
                     };
                 });
 
-                const maxScore = result.map(t => t.totalScore).reduce((acc, x) => x > acc ? x : acc)
+                const maxScore = result.map(t => t.totalScore).reduce((acc, x) => x > acc ? x : acc, 0);
 
                 return result.map(t => {
                     t.isLeader = t.totalScore == maxScore;
                     return t;
                 });
+            },
+            explainedWordsInRound() {
+                const game = this.game;
+                const round = this.game.round;
+
+                let roundScore = game.scores[round];
+                return Object.values(roundScore).reduce((acc, x) => acc + x, 0);
+            },
+            initialDeckSize() {
+                return this.game.initialDeckSize;
             }
         }
     });

@@ -49,6 +49,7 @@ data class Game private constructor(
     val state: GameState = GameState.GatheringParty,
     val players: Map<String, Player> = emptyMap(),
     val deck: Set<String> = emptySet(),
+    val initialDeckSize: Int = 0,
     val teams: List<Team> = emptyList(),
     val pairs: List<ExplainPair> = emptyList(),
     val currentTeam: Int = 0,
@@ -104,8 +105,10 @@ data class Game private constructor(
         if (currentPlayer == null || pairs[currentTeam].explainerId != currentPlayer.id)
             throw java.lang.IllegalArgumentException("Current player not explainer!")
 
-        return copy(currentTeam = (currentTeam + 1) % pairs.size)
+        return nextTeamInternal()
     }
+
+    private fun nextTeamInternal(): Game = copy(currentTeam = (currentTeam + 1) % pairs.size)
 
     fun joinGame(player: Player): Game {
         // Thread.sleep(TimeUnit.MILLISECONDS.toMillis(500))
@@ -147,7 +150,9 @@ data class Game private constructor(
         val pairsFromTeams = teams.map(Team::toPair)
         val reversedPairs = pairsFromTeams.map(ExplainPair::reverse)
         val pairs = pairsFromTeams + reversedPairs
-        return copy(state = GameState.Playing, pairs = pairs, teams = teams, currentTeam = 0).resetDeck()
+        return copy(state = GameState.Playing, pairs = pairs, teams = teams, currentTeam = 0)
+            .resetDeck()
+            .resetInitialDeckSize()
     }
 
     private fun resetDeck(): Game {
@@ -156,10 +161,14 @@ data class Game private constructor(
         return copy(deck = deck)
     }
 
+    private fun resetInitialDeckSize(): Game = copy(initialDeckSize = deck.size)
+
     private fun nextRound(): Game {
         if (round == Round.DescribeInOneWord)
             return copy(state = GameState.Finished)
-        return copy(round = Round.values()[round.ordinal + 1]).resetDeck()
+        return copy(round = Round.values()[round.ordinal + 1])
+            .resetDeck()
+            .nextTeamInternal()
     }
 }
 
